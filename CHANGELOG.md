@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Windows: exports work. PDF.js data folders were built with `\`, which PDF.js rejects ("Invalid factory url"); they now use `/`. macOS and Linux are unchanged.
+- CI runs the tests on Windows as well as Linux and macOS.
+
 ## 0.1.3-rc.0 (pre-release)
 
 - Same code as 0.1.2, published from GitHub Actions to test the release workflow. Installed only with `@superpdf/cli@next`.

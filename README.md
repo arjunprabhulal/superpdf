@@ -15,7 +15,7 @@
 
 **[Website](https://superpdf.ai) · [Docs](https://superpdf.ai/docs/mcp-api/command-line-tools) · [Benchmark](https://superpdf.ai/performance) · [Changelog](CHANGELOG.md)**
 
-[How it compares](#how-it-compares) · [Quick start](#quick-start) · [MCP tools](#mcp-tools) · [How it works](#how-it-works)
+[How it compares](#how-it-compares) · [Quick start](#quick-start) · [Python](#use-it-from-python) · [MCP tools](#mcp-tools) · [How it works](#how-it-works)
 
 <code>npx @superpdf/cli export report.pdf --output report.md</code>
 
@@ -98,6 +98,24 @@ With the command installed (`npm install -g @superpdf/cli`), use `superpdf mcp -
 `npx -y @superpdf/cli mcp --allow-dir …`. Then ask, for example: *"Read invoice.pdf in my superPDF folder and give me
 the line items as a table."* The assistant can only use the folders you pass with `--allow-dir`. Setup for each
 assistant: [superpdf.ai/docs/mcp-api/mcp-tool-access](https://superpdf.ai/docs/mcp-api/mcp-tool-access).
+
+### Use it from Python
+
+```bash
+pip install superpdf                 # or run without installing: uvx superpdf export report.pdf --output report.md
+```
+
+```python
+import superpdf
+
+markdown = superpdf.export("report.pdf")
+pages = superpdf.export_pages("report.pdf")        # Markdown per page
+
+from superpdf.langchain import SuperPDFLoader       # pip install "superpdf[langchain]"
+docs = SuperPDFLoader("report.pdf").load()
+```
+
+Node.js comes with the package. A LlamaIndex reader is included too; see [python/README.md](python/README.md).
 
 ### Use it from your own code (REST API)
 

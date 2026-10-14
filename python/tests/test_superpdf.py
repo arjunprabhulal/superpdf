@@ -293,3 +293,39 @@ def test_real_html_tables_and_json(real_cli: None) -> None:
 def test_real_error(real_cli: None, tmp_path: Path) -> None:
     with pytest.raises(superpdf.SuperPDFError, match="No file at"):
         superpdf.export(tmp_path / "missing.pdf")
+
+
+# The superpdf command (uvx superpdf / pipx run superpdf / python -m superpdf)
+
+
+def test_command_passes_arguments_through(monkeypatch: pytest.MonkeyPatch) -> None:
+    from superpdf import __main__ as cli_main
+
+    seen: dict[str, Any] = {}
+
+    def call(cmd: list[str], env: dict[str, str]) -> int:
+        seen.update(cmd=cmd, guard=env.get("SUPERPDF_PYTHON_WRAPPER"))
+        return 3
+
+    monkeypatch.delenv("SUPERPDF_PYTHON_WRAPPER", raising=False)
+    monkeypatch.setattr(cli_main, "command", lambda: ["node", "superpdf.js"])
+    monkeypatch.setattr(cli_main.subprocess, "call", call)
+    assert cli_main.main(["export", "a.pdf", "--output", "a.md"]) == 3
+    assert seen == {"cmd": ["node", "superpdf.js", "export", "a.pdf", "--output", "a.md"], "guard": "1"}
+
+
+def test_command_refuses_to_start_itself(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    from superpdf import __main__ as cli_main
+
+    monkeypatch.setenv("SUPERPDF_PYTHON_WRAPPER", "1")
+    assert cli_main.main(["help"]) == 1
+    assert "points to the Python superpdf command" in capsys.readouterr().err
+
+
+@pytest.mark.integration
+def test_real_command(real_cli: None, tmp_path: Path) -> None:
+    from superpdf import __main__ as cli_main
+
+    out = tmp_path / "r.md"
+    assert cli_main.main(["export", str(EXAMPLE), "--output", str(out)]) == 0
+    assert "# Quarterly report" in out.read_text(encoding="utf-8")

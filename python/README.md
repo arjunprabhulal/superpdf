@@ -27,6 +27,14 @@ python -c "import superpdf; superpdf.install_cli()"
 pip install superpdf
 pip install "superpdf[langchain]"      # with the LangChain loader
 pip install "superpdf[llama-index]"    # with the LlamaIndex reader
+uv add superpdf                        # in a uv project
+```
+
+Or run the command without installing anything:
+
+```bash
+uvx superpdf export report.pdf --output report.md
+pipx run superpdf export report.pdf --output report.md
 ```
 
 ## Use
@@ -73,12 +81,15 @@ docs = SuperPDFReader(tables="html").load_data("report.pdf")  # one Document per
 
 ## Command line
 
-`python -m superpdf` runs the same CLI, for example:
+The package installs a `superpdf` command that runs the full CLI (the same as `python -m superpdf`):
 
 ```bash
-python -m superpdf export report.pdf --output report.md
-python -m superpdf help
+superpdf export report.pdf --output report.md
+superpdf export report.pdf --tables html --output report.md
+superpdf help
 ```
+
+`uvx superpdf …` and `pipx run superpdf …` run it in a temporary environment, with nothing to install first.
 
 ## How it works
 
