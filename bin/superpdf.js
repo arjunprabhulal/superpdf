@@ -45,7 +45,7 @@ ${bold('Examples')}
   ${green('superpdf tool pdf_to_docx --input \'{"input":"report.pdf","output":"report.docx"}\'')}
   ${green('superpdf mcp --allow-dir ~/Documents/PDFs')}
 
-${bold('Good to know')}
+${bold('Notes')}
   ${dim('•')} Outputs are always new files; existing files are never overwritten.
   ${dim('•')} No page limit; files up to 2 GB.
   ${dim('•')} Scanned pages are read with OCR in English and 14 other languages; --no-ocr skips it.
