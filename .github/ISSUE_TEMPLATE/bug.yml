@@ -1,0 +1,16 @@
+name: Bug
+description: Something else doesn't work (a command, the MCP server, the API)
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you ran, what you expected, and what happened instead, including any error message.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Versions
+      description: Output of `superpdf --version` and `node --version`, your operating system, and your AI assistant if it's about MCP.
