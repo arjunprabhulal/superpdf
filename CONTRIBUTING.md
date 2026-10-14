@@ -46,11 +46,11 @@ Maintainers publish from GitHub: publishing a release runs [`release.yml`](.gith
 the tests, checks that the tag matches `package.json`, and stages the package on npm with provenance through npm
 trusted publishing. No npm token is stored in the repository.
 
-1. Bump the version without creating a tag: `npm version 0.2.0 --no-git-tag-version` (use the next patch, minor or
+1. Bump the version without creating a tag: `npm version X.Y.Z --no-git-tag-version` (use the next patch, minor or
    major version).
 2. Add a section for the new version at the top of [CHANGELOG.md](CHANGELOG.md).
-3. Commit both files as `chore(release): 0.2.0`, push to `main` and wait for CI to pass.
-4. Tag and push the tag: `git tag -a v0.2.0 -m "superPDF AI 0.2.0"`, then `git push origin v0.2.0`.
+3. Commit both files as `chore(release): X.Y.Z`, push to `main` and wait for CI to pass.
+4. Tag and push the tag: `git tag -a vX.Y.Z -m "superPDF AI X.Y.Z"`, then `git push origin vX.Y.Z`.
 5. Create a GitHub release from that tag, with the changelog section as the notes, and publish it. Mark it as a
    pre-release to publish under the `next` dist-tag instead of `latest`.
 6. When the Release workflow has finished, approve the staged version on npmjs.com (Staged Packages tab), or with

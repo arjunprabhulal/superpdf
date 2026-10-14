@@ -1,4 +1,4 @@
-"""superPDF for Python: read, convert, edit and compare PDFs on your computer.
+"""superPDF AI for Python: read, convert, edit and compare PDFs on your computer.
 
 A typed wrapper around the superPDF command-line tool (npm package @superpdf/cli): `export` gives the same results
 as `superpdf export`, and every other function runs one of the tools the MCP server and the local API run.

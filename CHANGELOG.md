@@ -5,6 +5,10 @@
 - `superpdf help` is reorganised: commands grouped under Read and convert, Edit pages, and For AI agents and code,
   with aligned descriptions, examples and notes. Colour on a terminal only, off with `NO_COLOR` (on with `FORCE_COLOR`).
 - The help no longer says "all 18 tools"; a test keeps any tool count out of it.
+- The help is headed superPDF AI and ends with links to the docs, the Python package and the source.
+- Security: CodeQL code scanning; every GitHub Action pinned to a commit SHA; checkouts don't keep the token;
+  Dependabot also watches the Python package.
+- npm keywords; the README lists every way to use superPDF AI (CLI, MCP, API, Python, uvx) with its docs.
 
 ## 0.3.0
 

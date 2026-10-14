@@ -1,6 +1,6 @@
-# superpdf (Python)
+# superPDF AI for Python (`superpdf`)
 
-[![PyPI](https://img.shields.io/pypi/v/superpdf?style=flat-square&color=4338ca)](https://pypi.org/project/superpdf/) [![Python](https://img.shields.io/pypi/pyversions/superpdf?style=flat-square)](https://pypi.org/project/superpdf/) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-555555?style=flat-square)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/superpdf?style=flat-square&color=4338ca)](https://pypi.org/project/superpdf/) [![Python](https://img.shields.io/pypi/pyversions/superpdf?style=flat-square)](https://pypi.org/project/superpdf/) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-555555?style=flat-square)](https://github.com/arjunprabhulal/superpdf/blob/main/LICENSE)
 
 **[superpdf.ai](https://superpdf.ai) · [Python docs](https://superpdf.ai/docs/python) · [GitHub](https://github.com/arjunprabhulal/superpdf) · [Changelog](https://github.com/arjunprabhulal/superpdf/blob/main/python/CHANGELOG.md)**
 
@@ -177,4 +177,4 @@ The reader is `@superpdf/cli` at the version this package is tested with, instal
 
 ## License
 
-[Apache-2.0](LICENSE).
+[Apache-2.0](https://github.com/arjunprabhulal/superpdf/blob/main/LICENSE).

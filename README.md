@@ -7,9 +7,9 @@
   </picture>
 </h1>
 
-### superPDF AI: a PDF reader, CLI and MCP server that run on your computer.
+### superPDF AI: PDF tools that run on your computer, from the command line, Python, AI assistants (MCP) or a local API.
 
-**Tables, charts, headings and scans to Markdown, HTML or JSON, read by rules, not a language model; scans go through Tesseract OCR. Nothing is uploaded.**
+**Tables, charts, headings and scans to Markdown, HTML or JSON; Word, Excel and PowerPoint; forms, merging and comparing. The reader works by rules, not a language model; scans go through Tesseract OCR. Nothing is uploaded.**
 
 [![CI](https://img.shields.io/github/actions/workflow/status/arjunprabhulal/superpdf/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/arjunprabhulal/superpdf/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/@superpdf/cli?style=flat-square&color=4338ca)](https://www.npmjs.com/package/@superpdf/cli) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-555555?style=flat-square)](LICENSE) [![Node.js 22+](https://img.shields.io/badge/Node.js-22%2B-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org) [![MCP server](https://img.shields.io/badge/MCP-server-4338ca?style=flat-square)](#use-it-from-your-ai-assistant-mcp)
 
@@ -31,9 +31,19 @@ superPDF reads a PDF the way it was made: from the text, fonts and drawings insi
 Markdown, HTML or JSON, with headings at the right level, tables with their rows and columns, and charts turned back
 into the numbers they were drawn from. Scanned pages are read with OCR in 15 languages.
 
-It runs on your computer as a command, as an MCP server for AI assistants such as Claude Code, Cursor and Codex, or as a
-local REST API for your own scripts. Files never leave the folders you allow. It is the same reader that powers
-[superpdf.ai](https://superpdf.ai) in the browser.
+It runs on your computer as a command, a Python package, an MCP server for AI assistants such as Claude Code, Cursor
+and Codex, or a local REST API for your own scripts. It only opens files in the folders you allow and never uploads them
+(through MCP, the text your assistant reads goes to its model, as with any file you show it). It is the same reader
+that powers [superpdf.ai](https://superpdf.ai) in the browser.
+
+| Use it as | Install or run | Docs |
+|---|---|---|
+| Command line | `npm install -g @superpdf/cli`, or `npx @superpdf/cli …` without installing | [CLI](https://superpdf.ai/docs/mcp-api/command-line-tools) |
+| MCP server for AI assistants | `superpdf mcp --allow-dir ~/Documents/superPDF` | [MCP setup](https://superpdf.ai/docs/mcp-api/mcp-tool-access) |
+| Local REST API (OpenAPI 3.1) | `superpdf serve --allow-dir ~/Documents/superPDF` | [API](https://superpdf.ai/docs/api) |
+| Python SDK | `pip install superpdf` or `uv add superpdf` | [Python](https://superpdf.ai/docs/python) |
+| Python, without installing | `uvx superpdf …` or `pipx run superpdf …` | [Python](https://superpdf.ai/docs/python#command) |
+| LangChain and LlamaIndex | `pip install "superpdf[langchain]"` or `"superpdf[llama-index]"` | [Loaders](https://superpdf.ai/docs/python/langchain-llamaindex) |
 
 ## How it compares
 
