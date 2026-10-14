@@ -6,8 +6,9 @@ Read PDFs into Markdown, HTML or JSON on your computer: headings, tables, charts
 pages. Nothing is uploaded.
 
 This package is a thin Python wrapper around the [superPDF command-line tool](https://github.com/arjunprabhulal/superpdf)
-(npm package `@superpdf/cli`), so you get exactly what `superpdf export` produces. It includes a LangChain document
-loader and a LlamaIndex reader.
+(npm package `@superpdf/cli`), so you get exactly what `superpdf export` produces. Every superPDF tool is a typed
+Python function (merge, split, extract, rotate, page numbers, watermark, protect, unlock, repair, Office to PDF,
+pipelines and batches), and it includes a LangChain document loader and a LlamaIndex reader.
 
 ## Requirements
 
@@ -61,6 +62,57 @@ superpdf.export("report.pdf", pages="1,3-5", tables="html", ocr=False)
 | `timeout` | Seconds before giving up (default 600) |
 
 Errors raise `superpdf.SuperPDFError` with superPDF's own message, for example `No file at report.pdf.`
+
+### Every PDF tool
+
+Every superPDF tool is a Python function: the same 18 tools as the MCP server and the local API, with the same
+validation and results. Each returns a typed dict; outputs are always new files (an existing file is never
+overwritten), and a call only touches the folders of the files you give it.
+
+```python
+import superpdf
+
+superpdf.merge(["a.pdf", "b.pdf"], "combined.pdf")  # {"output": ..., "pages": 7, "bytes": ...}
+superpdf.extract_pages("report.pdf", "1, 3-5", "selected.pdf")
+superpdf.rotate_pages("scan.pdf", "upright.pdf", pages="2", angle=180)
+superpdf.split("book.pdf", "chapters/", pages="1-10, 11-20")  # one PDF per range
+superpdf.add_page_labels("report.pdf", "numbered.pdf", text="Page {page} of {total}")
+superpdf.add_watermark("contract.pdf", "DRAFT", "draft.pdf")
+superpdf.protect("payslip.pdf", "a long password", "locked.pdf")  # AES-256
+superpdf.unlock("locked.pdf", "open.pdf", password="a long password")
+superpdf.from_office("slides.pptx", "slides.pdf")  # needs LibreOffice
+
+info = superpdf.info("report.pdf")  # pages, sizes, form fields, properties
+text = superpdf.read_text("report.pdf", pages="1-2")  # the text layer, page by page
+```
+
+| Function | What it does | Returns |
+|---|---|---|
+| `info(path)` | Page count, page sizes and rotation, form fields, properties | `PdfInfo` |
+| `list_files(folder=".")` | The PDFs in a folder | `Folder` |
+| `read_text(path, pages=, max_chars=)` | The text layer, page by page | `Text` |
+| `extract_structure(path, pages=, format=, max_chars=)` | Markdown, HTML or JSON plus the outline; OCR for scans | `Structure` |
+| `merge(inputs, output)` | Combine PDFs in order | `Written` |
+| `extract_pages(path, pages, output)` | Keep only some pages | `Written` |
+| `remove_pages(path, pages, output)` | Drop pages | `Written` |
+| `rotate_pages(path, output, pages=, angle=90\|180\|270)` | Rotate clockwise | `Written` |
+| `split(path, output_folder, pages=, mode="ranges"\|"pages")` | One PDF per range or per page | `SplitResult` |
+| `add_page_labels(path, output, pages=, text="{page} / {total}")` | Page numbers or a footer | `Written` |
+| `add_watermark(path, text, output, pages=)` | Stamp text such as DRAFT diagonally | `Written` |
+| `remove_metadata(path, output)` | Strip document properties | `Written` |
+| `repair(path, output)` | Rebuild a damaged PDF | `RepairResult` |
+| `protect(path, password, output)` | Encrypt with AES-256 | `Written` |
+| `unlock(path, output, password=)` | Decrypt with a password you know | `Written` |
+| `from_office(path, output)` | Word, Excel, PowerPoint or OpenDocument to PDF (LibreOffice) | `OfficeResult` |
+| `run_pipeline(path, steps, output)` | Up to 10 steps on one PDF, saved once | `Written` |
+| `run_batch(inputs, steps, output_folder, suffix=)` | The same steps on up to 50 PDFs; failures listed, not raised | `BatchResult` |
+
+`pages` takes numbers and ranges such as `"1, 3-5"`. Pipeline and batch steps are dicts such as
+`{"action": "rotate", "options": {"pages": "1", "angle": 90}}`; the actions are extract, remove, rotate, crop
+(margin), scale (factor), flatten, labels, watermark and metadata-clear.
+
+`superpdf.tools()` lists every tool with its JSON input schema, and `superpdf.run_tool(name, arguments, allow=[...])`
+runs any of them by name, for tools added to the CLI before this package catches up.
 
 ### LangChain
 

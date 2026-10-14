@@ -21,6 +21,8 @@ superpdf convert report.docx --output report.pdf   (.docx .xlsx .pptx .odt .ods 
 superpdf audio input.pdf --output input.m4a   (read aloud with the macOS system voice; --pages, --voice, --speed slower|faster)
 superpdf mcp --allow-dir ~/Documents/PDFs   (MCP server for AI agents, over stdio)
 superpdf serve --allow-dir ~/Documents/PDFs (HTTP API on 127.0.0.1:7341; superpdf serve --help)
+superpdf tools                               (all 18 tools with their JSON input schemas)
+superpdf tool pdf_protect --input '{"input":"a.pdf","password":"…","output":"locked.pdf"}'   (run one tool; JSON result)
 
 Files are processed on this computer. Nothing is uploaded.
 export reads scanned pages (no text layer) with superPDF OCR (English and 14 other languages, told from the page), as the app does; --no-ocr skips it.
@@ -50,7 +52,12 @@ async function mustBeNew(path){
  throw Object.assign(new Error('exists'),{code:'EEXIST'});
 }
 const actions=new Set(['info','merge','extract','rotate','pipeline','export','convert','audio']);
-if(process.argv[2]==='mcp'){
+if(process.argv[2]==='tool'||process.argv[2]==='tools'){
+ // The shared contracts (as the MCP server and the API run them), with JSON in and JSON out: for scripts and Python.
+ const {main}=await import('../contracts/cli.js');
+ await main(process.argv.slice(2)).catch(error=>{process.stderr.write(`superPDF: ${error.message}\n`);process.exitCode=1;});
+}
+else if(process.argv[2]==='mcp'){
  // stdout belongs to the MCP protocol from here on; diagnostics go to stderr.
  const {main}=await import('../mcp/server.js');
  await main(process.argv.slice(3)).catch(error=>{process.stderr.write(`superPDF: ${error.message}\n`);process.exitCode=1;});

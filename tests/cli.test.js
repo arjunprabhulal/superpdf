@@ -124,3 +124,17 @@ test('local API needs its token and stays inside --allow-dir', async () => {
     assert.ok((await post({ input: '/etc/hosts' })).status >= 400);
   } finally { server.kill(); }
 });
+
+test('tools lists every tool and tool runs one, inside --allow-dir only', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'superpdf-test-'));
+  await samplePdf(dir, 'a.pdf', 2);
+  const { stdout } = await cli(['tools'], dir);
+  const tools = JSON.parse(stdout);
+  assert.equal(tools.length, 18);
+  assert.ok(tools.every(t => t.name.startsWith('pdf_') && t.input_schema.type === 'object'));
+  const merged = JSON.parse((await cli(['tool', 'pdf_merge', '--input', JSON.stringify({ inputs: ['a.pdf', 'a.pdf'], output: 'b.pdf' })], dir)).stdout);
+  assert.equal(merged.value.pages, 4);
+  await assert.rejects(cli(['tool', 'pdf_rotate_pages', '--input', '{"input":"a.pdf","angle":45,"output":"c.pdf"}'], dir), /angle: use 90, 180 or 270/);
+  await assert.rejects(cli(['tool', 'pdf_info', '--input', JSON.stringify({ input: BIN })], dir), /outside the allowed folders/);
+  await assert.rejects(cli(['tool', 'pdf_nope'], dir), /no tool called pdf_nope/);
+});
