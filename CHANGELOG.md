@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- README: the benchmark comparison now comes before Quick start. No code changes.
+
 ## 0.1.0
 
 First public release.
