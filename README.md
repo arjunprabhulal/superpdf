@@ -15,13 +15,13 @@
 
 **[Website](https://superpdf.ai) · [Docs](https://superpdf.ai/docs/mcp-api/command-line-tools) · [Benchmark](https://superpdf.ai/performance) · [Changelog](CHANGELOG.md)**
 
-[Quick start](#quick-start) · [What it reads](#what-it-reads) · [Commands](#commands) · [MCP tools](#mcp-tools) · [What makes it different](#what-makes-it-different) · [How it compares](#how-it-compares) · [How it works](#how-it-works) · [Privacy and security](#privacy-and-security)
+[Quick start](#quick-start) · [MCP tools](#mcp-tools) · [How it compares](#how-it-compares) · [How it works](#how-it-works)
 
 <code>npx @superpdf/cli export report.pdf --output report.md</code>
 
 <br><br>
 
-<img src="docs/assets/hero.png" alt="Input: a one-page report PDF with a table and a bar chart. Output: the Markdown superPDF writes from it, with the heading levels, the table, and the chart's values as a table" width="1000">
+<img src="docs/assets/agent-session.png" alt="A real Claude Code session: asked to combine two invoices and list their vendor, number, due date and total, Claude calls superPDF's pdf_merge and pdf_read_text tools and answers with the correct table" width="1000">
 
 </div>
 
@@ -89,6 +89,8 @@ This starts a private API on `127.0.0.1` that only this computer can reach. It p
 [superpdf.ai/docs/api](https://superpdf.ai/docs/api).
 
 ## What it reads
+
+<img src="docs/assets/pdf-to-markdown.png" alt="Input: a one-page report PDF with a table and a bar chart. Output: the Markdown superPDF writes from it, with the heading levels, the table, and the chart's values as a table" width="1000">
 
 | Part of the PDF | How superPDF reads it |
 |---|---|
