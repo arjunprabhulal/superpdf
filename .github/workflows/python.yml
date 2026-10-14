@@ -3,9 +3,8 @@ name: Python
 on:
   push:
     branches: [main]
-    paths: ["python/**", ".github/workflows/python.yml"]
+  # Every pull request, so these checks can be required on main (the Python package runs the CLI in lib/ and bin/).
   pull_request:
-    paths: ["python/**", ".github/workflows/python.yml"]
 
 permissions:
   contents: read

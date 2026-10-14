@@ -36,6 +36,9 @@ llama-index = ["llama-index-core>=0.12"]
 [dependency-groups]
 dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.11", "build>=1.2"]
 
+[project.scripts]
+superpdf = "superpdf.__main__:main"
+
 [project.urls]
 Homepage = "https://superpdf.ai"
 Documentation = "https://github.com/arjunprabhulal/superpdf/tree/main/python#readme"
