@@ -1,0 +1,69 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "superpdf"
+dynamic = ["version"]
+description = "PDFs to Markdown, HTML or JSON on your computer: headings, tables, charts as data and OCR. Python wrapper for the superPDF CLI."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "Arjun Prabhulal", email = "arjun.prabhulal@gmail.com" }]
+keywords = ["pdf", "pdf-to-markdown", "pdf-parser", "ocr", "tables", "charts", "rag", "langchain", "llama-index"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: Microsoft :: Windows",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Text Processing :: Markup :: Markdown",
+  "Typing :: Typed",
+]
+dependencies = ["nodejs-wheel-binaries>=22"]
+
+[project.optional-dependencies]
+langchain = ["langchain-core>=0.3"]
+llama-index = ["llama-index-core>=0.12"]
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.11", "build>=1.2"]
+
+[project.urls]
+Homepage = "https://superpdf.ai"
+Documentation = "https://github.com/arjunprabhulal/superpdf/tree/main/python#readme"
+Source = "https://github.com/arjunprabhulal/superpdf"
+Issues = "https://github.com/arjunprabhulal/superpdf/issues"
+Changelog = "https://github.com/arjunprabhulal/superpdf/blob/main/python/CHANGELOG.md"
+
+[tool.hatch.version]
+path = "src/superpdf/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/superpdf"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "README.md", "CHANGELOG.md", "LICENSE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: runs the real superPDF CLI (needs Node.js 22+)"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true

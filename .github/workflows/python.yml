@@ -1,0 +1,61 @@
+name: Python
+
+on:
+  push:
+    branches: [main]
+    paths: ["python/**", ".github/workflows/python.yml"]
+  pull_request:
+    paths: ["python/**", ".github/workflows/python.yml"]
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: python
+
+jobs:
+  lint:
+    name: Lint and type check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v10
+        with:
+          python-version: "3.13"
+      - run: uv sync --locked --all-extras
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy src
+
+  test:
+    name: Python ${{ matrix.python }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v10
+        with:
+          python-version: ${{ matrix.python }}
+      - run: uv sync --locked --all-extras
+      # The integration tests install the pinned @superpdf/cli from npm with the bundled Node.js, as users do.
+      - run: uv run pytest -q -rs
+
+  build:
+    name: Build and check the package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v10
+      - run: uv build
+      - run: uvx twine check --strict dist/*

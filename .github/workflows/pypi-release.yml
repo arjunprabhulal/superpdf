@@ -1,0 +1,58 @@
+name: PyPI release
+
+# Publishes the Python package (python/) to PyPI when a tag like py-v0.1.0 is pushed.
+# Authentication is PyPI trusted publishing (OIDC): no token is stored in this repository.
+# The publish job runs in the `pypi` environment; add required reviewers there to approve each release.
+
+on:
+  push:
+    tags: ["py-v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v10
+      - name: Check the tag matches the package version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          version="$(uv run --no-project python -c "import re,pathlib;print(re.search(r'__version__ = \"(.+?)\"', pathlib.Path('src/superpdf/__init__.py').read_text()).group(1))")"
+          if [ "$TAG" != "py-v$version" ]; then
+            echo "::error::Tag $TAG does not match the package version $version (expected py-v$version)"
+            exit 1
+          fi
+      - run: uv sync --locked --all-extras
+      - run: uv run pytest -q
+      - run: uv build
+      - run: uvx twine check --strict dist/*
+      - uses: actions/upload-artifact@v7
+        with:
+          name: python-package-distributions
+          path: python/dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/superpdf
+    permissions:
+      id-token: write # PyPI trusted publishing
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: python-package-distributions
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

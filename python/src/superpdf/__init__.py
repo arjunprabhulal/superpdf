@@ -1,0 +1,70 @@
+"""superPDF for Python: PDFs to Markdown, HTML or JSON on your computer.
+
+A thin wrapper around the superPDF command-line tool (npm package @superpdf/cli), so the results are the
+same as `superpdf export`. Node.js comes with the package (nodejs-wheel-binaries).
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+from typing import Any
+
+from ._cli import CLI_VERSION, SuperPDFError, install_cli, run
+
+__all__ = ["CLI_VERSION", "SuperPDFError", "export", "export_json", "export_pages", "install_cli"]
+__version__ = "0.1.0"
+
+_PAGE_END = re.compile(r"^<!-- end of page (\d+) -->\s*$", re.MULTILINE)
+
+
+def _args(path: str | os.PathLike[str], fmt: str, pages: str | None, tables: str | None, ocr: bool) -> list[str]:
+    args = ["export", os.fspath(path), "--format", fmt]
+    if pages:
+        args += ["--pages", pages]
+    if tables:
+        args += ["--tables", tables]
+    if not ocr:
+        args.append("--no-ocr")
+    return args
+
+
+def export(
+    path: str | os.PathLike[str],
+    format: str = "markdown",
+    *,
+    pages: str | None = None,
+    tables: str | None = None,
+    ocr: bool = True,
+    timeout: float | None = 600,
+) -> str:
+    """Read a PDF and return it as Markdown, HTML or JSON text.
+
+    pages: a selection such as "1,3-5" (all pages when omitted).
+    tables: "html" writes Markdown tables as HTML, keeping merged header cells (Markdown only).
+    ocr: read scanned pages with superPDF OCR (Tesseract, 15 languages); False skips it.
+    """
+    if format not in ("markdown", "html", "json"):
+        raise ValueError("format must be 'markdown', 'html' or 'json'.")
+    if tables not in (None, "markdown", "html"):
+        raise ValueError("tables must be 'markdown' or 'html'.")
+    if tables and format != "markdown":
+        raise ValueError("tables applies to Markdown only.")
+    return run(_args(path, format, pages, tables, ocr), timeout=timeout)
+
+
+def export_json(path: str | os.PathLike[str], **options: Any) -> dict[str, Any]:
+    """The document's structure as a dict: title, pageCount, pages (blocks with type and bbox) and sections."""
+    structure: dict[str, Any] = json.loads(export(path, "json", **options))
+    return structure
+
+
+def export_pages(path: str | os.PathLike[str], **options: Any) -> list[dict[str, Any]]:
+    """Markdown per page: a list of {"page": number, "markdown": text}."""
+    text = export(path, "markdown", **options)
+    result, start = [], 0
+    for match in _PAGE_END.finditer(text):
+        result.append({"page": int(match.group(1)), "markdown": text[start : match.start()].strip()})
+        start = match.end()
+    return result
