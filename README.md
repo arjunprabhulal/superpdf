@@ -148,6 +148,8 @@ This starts a private API on `127.0.0.1` that only this computer can reach. It p
 
 ## Commands
 
+<img src="docs/assets/cli-help.png" alt="superpdf help in a terminal: commands grouped under Read and convert, Edit pages, and For AI agents and code, then examples and notes" width="820">
+
 ```bash
 superpdf info document.pdf                                    # pages, sizes, form fields, properties
 superpdf merge a.pdf b.pdf --output combined.pdf
