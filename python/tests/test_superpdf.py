@@ -177,6 +177,47 @@ def test_old_node_is_explained(monkeypatch: pytest.MonkeyPatch) -> None:
         _cli._node()
 
 
+def _wheel(root: Path, files: list[str]) -> Path:
+    for name in files:
+        (root / name).parent.mkdir(parents=True, exist_ok=True)
+        (root / name).write_text("")
+    return root
+
+
+@pytest.mark.parametrize(
+    ("windows", "node", "npm"),
+    [
+        (True, "node.exe", "lib/node_modules/npm/bin/npm-cli.js"),  # the Windows wheel (24.x)
+        (False, "bin/node", "lib/node_modules/npm/bin/npm-cli.js"),  # macOS and Linux wheels
+        (True, "node.exe", "node_modules/npm/bin/npm-cli.js"),  # an older Windows layout
+    ],
+)
+def test_bundled_layouts(tmp_path: Path, windows: bool, node: str, npm: str) -> None:
+    root = _wheel(tmp_path, [node, npm])
+    assert _cli._bundled(root, windows=windows) == (str(root / node), [str(root / node), str(root / npm)])
+
+
+def test_bundled_without_node_is_skipped(tmp_path: Path) -> None:
+    assert _cli._bundled(_wheel(tmp_path, ["lib/node_modules/npm/bin/npm-cli.js"]), windows=True) is None
+
+
+def test_real_windows_wheel_layout(tmp_path: Path) -> None:
+    """The file names inside the published win_amd64 wheel, when it has been downloaded for this check."""
+    import zipfile
+
+    wheel = os.environ.get("SUPERPDF_WINDOWS_WHEEL")
+    if not wheel:
+        pytest.skip("set SUPERPDF_WINDOWS_WHEEL to a nodejs_wheel_binaries win_amd64 wheel to check its layout")
+    names = [
+        n.removeprefix("nodejs_wheel/") for n in zipfile.ZipFile(wheel).namelist() if n.startswith("nodejs_wheel/")
+    ]
+    wanted = [
+        n for n in names if n in ("node.exe", "lib/node_modules/npm/bin/npm-cli.js", "node_modules/npm/bin/npm-cli.js")
+    ]
+    found = _cli._bundled(_wheel(tmp_path, wanted), windows=True)
+    assert found is not None and found[1] is not None
+
+
 def test_bundled_node_is_used() -> None:
     pytest.importorskip("nodejs_wheel")
     node, npm = _cli._node()

@@ -22,20 +22,30 @@ class SuperPDFError(RuntimeError):
     """The superPDF command failed, or the CLI couldn't be found or installed."""
 
 
+def _bundled(root: Path, windows: bool) -> tuple[str, list[str] | None] | None:
+    """Node.js and npm inside a nodejs-wheel-binaries folder, or None if its node binary is missing.
+
+    The wheel puts node.exe at the top on Windows and bin/node elsewhere; npm is under lib/node_modules on every
+    platform (node_modules is checked too, for older layouts).
+    """
+    node = root / "node.exe" if windows else root / "bin" / "node"
+    if not node.exists():
+        return None
+    candidates = (root / "lib" / "node_modules" / "npm", root / "node_modules" / "npm")
+    npm = next((c / "bin" / "npm-cli.js" for c in candidates if (c / "bin" / "npm-cli.js").exists()), None)
+    return str(node), [str(node), str(npm)] if npm else None
+
+
 def _node() -> tuple[str, list[str] | None]:
     """The Node.js binary and the npm command: from nodejs-wheel-binaries, else Node.js 22+ on PATH."""
     try:
         import nodejs_wheel
 
-        bundled: Path | None = Path(nodejs_wheel.__file__).parent
+        found = _bundled(Path(nodejs_wheel.__file__).parent, windows=os.name == "nt")
     except ImportError:
-        bundled = None
-    if bundled is not None:
-        root = bundled
-        node = root / ("node.exe" if os.name == "nt" else "bin/node")
-        npm = root / ("node_modules" if os.name == "nt" else "lib/node_modules") / "npm" / "bin" / "npm-cli.js"
-        if node.exists():
-            return str(node), [str(node), str(npm)] if npm.exists() else None
+        found = None
+    if found is not None:
+        return found
     node_path = shutil.which("node")
     if node_path is None:
         raise SuperPDFError(
