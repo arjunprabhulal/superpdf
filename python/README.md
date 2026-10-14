@@ -2,13 +2,14 @@
 
 [![PyPI](https://img.shields.io/pypi/v/superpdf?style=flat-square&color=4338ca)](https://pypi.org/project/superpdf/) [![Python](https://img.shields.io/pypi/pyversions/superpdf?style=flat-square)](https://pypi.org/project/superpdf/) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-555555?style=flat-square)](LICENSE)
 
-Read PDFs into Markdown, HTML or JSON on your computer: headings, tables, charts as data and OCR for scanned
-pages. Nothing is uploaded.
+Read, convert, edit and compare PDFs on your computer: Markdown, HTML or JSON with headings, tables, charts as data
+and OCR for scanned pages; Word, PowerPoint, Excel and EPUB; forms, signatures, merging and splitting. Nothing is
+uploaded.
 
 This package is a thin Python wrapper around the [superPDF command-line tool](https://github.com/arjunprabhulal/superpdf)
 (npm package `@superpdf/cli`), so you get exactly what `superpdf export` produces. Every superPDF tool is a typed
-Python function (merge, split, extract, rotate, page numbers, watermark, protect, unlock, repair, Office to PDF,
-pipelines and batches), and it includes a LangChain document loader and a LlamaIndex reader.
+Python function (Word, PowerPoint and EPUB export, tables to Excel or CSV, forms, merge, split, rotate, page
+numbers, watermark, protect, compare, Office to PDF, pipelines and batches), and it includes a LangChain document loader and a LlamaIndex reader.
 
 ## Requirements
 
@@ -65,7 +66,7 @@ Errors raise `superpdf.SuperPDFError` with superPDF's own message, for example `
 
 ### Every PDF tool
 
-Every superPDF tool is a Python function: the same 18 tools as the MCP server and the local API, with the same
+Every superPDF tool is a Python function: the same 30 tools as the MCP server and the local API, with the same
 validation and results. Each returns a typed dict; outputs are always new files (an existing file is never
 overwritten), and a call only touches the folders of the files you give it.
 
@@ -82,6 +83,12 @@ superpdf.protect("payslip.pdf", "a long password", "locked.pdf")  # AES-256
 superpdf.unlock("locked.pdf", "open.pdf", password="a long password")
 superpdf.from_office("slides.pptx", "slides.pdf")  # needs LibreOffice
 
+superpdf.to_docx("report.pdf", "report.docx")  # editable Word: headings, lists, tables
+superpdf.extract_tables("report.pdf", "tables.xlsx")  # or tables.csv with format="csv"
+superpdf.fill_form("form.pdf", {"Name": "Ada Lovelace", "Agree": True}, "filled.pdf")
+superpdf.add_text("contract.pdf", "Signed: Ada Lovelace", "signed.pdf", pages="3", x=72, y=96)
+changes = superpdf.compare("v1.pdf", "v2.pdf")  # per page: same, changed, added or removed
+
 info = superpdf.info("report.pdf")  # pages, sizes, form fields, properties
 text = superpdf.read_text("report.pdf", pages="1-2")  # the text layer, page by page
 ```
@@ -97,13 +104,25 @@ text = superpdf.read_text("report.pdf", pages="1-2")  # the text layer, page by 
 | `remove_pages(path, pages, output)` | Drop pages | `Written` |
 | `rotate_pages(path, output, pages=, angle=90\|180\|270)` | Rotate clockwise | `Written` |
 | `split(path, output_folder, pages=, mode="ranges"\|"pages")` | One PDF per range or per page | `SplitResult` |
-| `add_page_labels(path, output, pages=, text="{page} / {total}")` | Page numbers or a footer | `Written` |
+| `add_page_labels(path, output, pages=, text="{page} / {total}", position="bottom"\|"top")` | Page numbers, a footer or a header | `Written` |
 | `add_watermark(path, text, output, pages=)` | Stamp text such as DRAFT diagonally | `Written` |
 | `remove_metadata(path, output)` | Strip document properties | `Written` |
 | `repair(path, output)` | Rebuild a damaged PDF | `RepairResult` |
 | `protect(path, password, output)` | Encrypt with AES-256 | `Written` |
 | `unlock(path, output, password=)` | Decrypt with a password you know | `Written` |
 | `from_office(path, output)` | Word, Excel, PowerPoint or OpenDocument to PDF (LibreOffice) | `OfficeResult` |
+| `add_text(path, text, output, pages=, x=36, y=36, size=12)` | Draw text such as a typed signature (points from bottom-left) | `Written` |
+| `resize_pages(path, output, mode="crop"\|"scale", pages=, margin=24, factor=1)` | Crop a margin from each edge, or scale | `Written` |
+| `fill_form(path, values, output, flatten=False)` | Fill form fields by name (`info` lists them) | `Written` |
+| `flatten(path, output)` | Make form fields part of the page | `Written` |
+| `to_docx(path, output, pages=)` | Editable Word: headings, bold and italic, lists, tables; OCR for scans | `WordResult` |
+| `to_pptx(path, output, pages=)` | PowerPoint, one slide per page, text as text boxes | `SlidesResult` |
+| `to_epub(path, output, title=, author=, language="en", split="headings"\|"pages")` | EPUB 3 e-book in chapters | `EpubResult` |
+| `extract_tables(path, output, pages=, format="xlsx"\|"csv"\|"json"\|"markdown")` | Tables and vector charts; `output` ends in the format's extension | `TablesResult` |
+| `from_images(inputs, output)` | JPG or PNG images to PDF, one page each | `Written` |
+| `from_markdown(path, output, page_size="A4"\|"Letter", title=)` | Typeset a Markdown file as a PDF | `Written` |
+| `compare(before, after, max_chars=20000)` | The words that changed, page by page, marked `[-old-]` and `{+new+}` | `Comparison` |
+| `outline(path, format="markdown"\|"json")` | The outline, with the pages each section covers | `Outline` |
 | `run_pipeline(path, steps, output)` | Up to 10 steps on one PDF, saved once | `Written` |
 | `run_batch(inputs, steps, output_folder, suffix=)` | The same steps on up to 50 PDFs; failures listed, not raised | `BatchResult` |
 

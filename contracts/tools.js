@@ -14,6 +14,7 @@ import { InputError } from '../mcp/scope.js';
 import { cleanText, cleanValue } from './untrusted.js';
 import { plainMessage } from './errors.js';
 import { limitsFor } from './limits.js';
+import { documentContracts } from './documents.js';
 
 const require = createRequire(import.meta.url);
 setQpdfWasm(require.resolve('@neslinesli93/qpdf-wasm/dist/qpdf.wasm'));
@@ -216,7 +217,7 @@ export const contracts = [
   pageTool('pdf_extract_pages', 'Extract PDF pages', 'Copy the listed pages, in the order listed, into one new PDF.', 'extract'),
   pageTool('pdf_remove_pages', 'Delete PDF pages', 'Write a new PDF without the listed pages. At least one page must remain.', 'remove'),
   pageTool('pdf_rotate_pages', 'Rotate PDF', 'Rotate PDF clockwise by 90, 180 or 270 degrees.', 'rotate', { angle: angleField }),
-  pageTool('pdf_add_page_labels', 'Add page labels', 'Add page numbers or a footer. Use {page} and {total} in the text.', 'labels', { text: z.string().min(1).max(120).default('{page} / {total}') }),
+  pageTool('pdf_add_page_labels', 'Add page labels', 'Add page numbers or a footer. Use {page} and {total} in the text.', 'labels', { text: z.string().min(1).max(120).default('{page} / {total}'), position: z.enum(['top', 'bottom']).default('bottom').describe('Where on the page the label goes.') }),
   pageTool('pdf_add_watermark', 'Add a watermark', 'Stamp text diagonally across pages, such as DRAFT or CONFIDENTIAL.', 'watermark', { text: z.string().min(1).max(60) }),
   {
     name: 'pdf_split', title: 'Split a PDF', annotations: CREATE, long: true,
@@ -336,6 +337,8 @@ export const contracts = [
       return { value: { outputs, failed }, files: outputs.map(o => o.output) };
     },
   },
+  // Conversions, forms, tables, comparison and page tools (contracts/documents.js).
+  ...documentContracts({ READ, CREATE, inputField, outputField, pagesField, written, loadInput, save, one, asInput }),
 ];
 
 export const contractByName = new Map(contracts.map(c => [c.name, c]));

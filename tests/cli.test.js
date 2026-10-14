@@ -130,7 +130,7 @@ test('tools lists every tool and tool runs one, inside --allow-dir only', async 
   await samplePdf(dir, 'a.pdf', 2);
   const { stdout } = await cli(['tools'], dir);
   const tools = JSON.parse(stdout);
-  assert.equal(tools.length, 18);
+  assert.equal(tools.length, 30);
   assert.ok(tools.every(t => t.name.startsWith('pdf_') && t.input_schema.type === 'object'));
   const merged = JSON.parse((await cli(['tool', 'pdf_merge', '--input', JSON.stringify({ inputs: ['a.pdf', 'a.pdf'], output: 'b.pdf' })], dir)).stdout);
   assert.equal(merged.value.pages, 4);

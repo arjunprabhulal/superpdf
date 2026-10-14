@@ -112,13 +112,14 @@ markdown = superpdf.export("report.pdf")
 pages = superpdf.export_pages("report.pdf")        # Markdown per page
 
 superpdf.merge(["a.pdf", "b.pdf"], "combined.pdf")  # every tool is a typed function
-superpdf.protect("payslip.pdf", "a long password", "locked.pdf")
+superpdf.extract_tables("report.pdf", "tables.xlsx")
+superpdf.to_docx("report.pdf", "report.docx")
 
 from superpdf.langchain import SuperPDFLoader       # pip install "superpdf[langchain]"
 docs = SuperPDFLoader("report.pdf").load()
 ```
 
-Node.js comes with the package. All 18 tools, a LlamaIndex reader and the full reference are in
+Node.js comes with the package. All 30 tools, a LlamaIndex reader and the full reference are in
 [python/README.md](python/README.md).
 
 ### Use it from your own code (REST API)
@@ -128,7 +129,8 @@ superpdf serve --allow-dir ~/Documents/superPDF
 ```
 
 This starts a private API on `127.0.0.1` that only this computer can reach. It prints a token when it starts (or set
-`SUPERPDF_API_TOKEN`, at least 32 characters); every request under `/v1/` needs it. Guide and reference:
+`SUPERPDF_API_TOKEN`, at least 32 characters); every request under `/v1/` needs it. The OpenAPI 3.1 document is served at `/openapi.json` (also
+[openapi.json](openapi.json) here, generated from the tool schemas). Guide and reference:
 [superpdf.ai/docs/api](https://superpdf.ai/docs/api).
 
 ## What it reads
@@ -156,7 +158,7 @@ superpdf export document.pdf --tables html --output doc.md    # tables as HTML, 
 superpdf convert report.docx --output report.pdf              # Word, Excel, PowerPoint; needs LibreOffice
 superpdf pipeline document.pdf --steps steps.json --output result.pdf
 superpdf audio document.pdf --output document.m4a             # read aloud with the macOS system voice
-superpdf tools                                                # all 18 tools with their JSON input schemas
+superpdf tools                                                # all 30 tools with their JSON input schemas
 superpdf tool pdf_protect --input '{"input":"a.pdf","password":"…","output":"locked.pdf"}'   # any tool, JSON in and out
 ```
 
@@ -172,7 +174,13 @@ Try `info` and `export` on [`examples/quarterly-report.pdf`](examples/quarterly-
 | `pdf_read_text` | The embedded text, page by page |
 | `pdf_extract_structure` | Markdown, HTML or JSON with headings, tables, charts and lists |
 | `pdf_merge`, `pdf_split`, `pdf_extract_pages`, `pdf_remove_pages` | Combine and separate pages into new PDFs |
-| `pdf_rotate_pages`, `pdf_add_page_labels`, `pdf_add_watermark` | Rotate, number and stamp pages |
+| `pdf_extract_tables` | Tables and vector charts as Excel, CSV, JSON or Markdown |
+| `pdf_outline`, `pdf_compare` | The outline with each section's pages; what changed between two versions, page by page |
+| `pdf_to_docx`, `pdf_to_pptx`, `pdf_to_epub` | Editable Word, PowerPoint (text as text boxes) and EPUB 3 |
+| `pdf_from_images`, `pdf_from_markdown` | JPG and PNG images, or a Markdown file, to PDF |
+| `pdf_fill_form`, `pdf_flatten` | Fill form fields by name; make fields part of the page |
+| `pdf_add_text`, `pdf_resize_pages` | Typed signatures and notes; crop margins or scale pages |
+| `pdf_rotate_pages`, `pdf_add_page_labels`, `pdf_add_watermark` | Rotate, number (header or footer) and stamp pages |
 | `pdf_protect`, `pdf_unlock`, `pdf_remove_metadata`, `pdf_repair` | AES-256 passwords, clean properties, fix damaged files |
 | `pdf_from_office` | Word, Excel and PowerPoint to PDF (needs LibreOffice) |
 | `pdf_run_pipeline`, `pdf_run_batch` | Up to 10 steps on one PDF, or the same steps on up to 50 PDFs |
