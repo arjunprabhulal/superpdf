@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Tables: a data row whose numbers are one digit longer than the rows below is no longer marked as a header row in HTML output (`--tables html` and the HTML export).
+
 ## 0.1.1
 
 - README: the benchmark comparison now comes before Quick start. No code changes.
