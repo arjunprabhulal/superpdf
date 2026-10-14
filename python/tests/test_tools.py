@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import types
 import typing
+import zipfile
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -39,6 +40,18 @@ FUNCTIONS: dict[str, Callable[..., Any]] = {
     "pdf_unlock": superpdf.unlock,
     "pdf_run_pipeline": superpdf.run_pipeline,
     "pdf_run_batch": superpdf.run_batch,
+    "pdf_to_docx": superpdf.to_docx,
+    "pdf_extract_tables": superpdf.extract_tables,
+    "pdf_fill_form": superpdf.fill_form,
+    "pdf_add_text": superpdf.add_text,
+    "pdf_flatten": superpdf.flatten,
+    "pdf_resize_pages": superpdf.resize_pages,
+    "pdf_from_images": superpdf.from_images,
+    "pdf_from_markdown": superpdf.from_markdown,
+    "pdf_to_pptx": superpdf.to_pptx,
+    "pdf_to_epub": superpdf.to_epub,
+    "pdf_compare": superpdf.compare,
+    "pdf_outline": superpdf.outline,
 }
 RENAMED = {"path": "input"}
 PYTHON_ONLY = {"timeout"}
@@ -155,7 +168,7 @@ def test_page_tools(work: Path) -> None:
 @pytest.mark.integration
 def test_changing_tools(work: Path) -> None:
     one = work / "one.pdf"
-    assert superpdf.add_page_labels(one, work / "l.pdf", text="Page {page} of {total}")["pages"] == 1
+    assert superpdf.add_page_labels(one, work / "l.pdf", text="Page {page} of {total}", position="top")["pages"] == 1
     assert superpdf.add_watermark(one, "DRAFT", work / "w.pdf")["pages"] == 1
     assert superpdf.remove_metadata(one, work / "m.pdf")["pages"] == 1
     assert superpdf.repair(one, work / "fixed.pdf")["fixed"] == []
@@ -179,13 +192,64 @@ def test_pipeline_and_batch(work: Path) -> None:
     assert [Path(f["input"]).name for f in result["failed"]] == ["one.pdf"]
 
 
+@pytest.mark.integration
+def test_converting_tools(work: Path) -> None:
+    one = work / "one.pdf"
+    word = superpdf.to_docx(one, work / "one.docx")
+    assert word["tables"] >= 1 and zipfile.is_zipfile(word["output"])
+    assert superpdf.to_pptx(one, work / "one.pptx")["slides"] == 1
+    assert superpdf.to_epub(one, work / "one.epub", author="Northwind")["chapters"] >= 1
+    assert superpdf.extract_tables(one, work / "tables.xlsx")["tables"] >= 1
+    tables = superpdf.extract_tables(one, work / "tables.csv", format="csv")
+    assert tables["format"] == "csv" and (work / "tables.csv").read_text(encoding="utf-8").strip()
+    with pytest.raises(superpdf.SuperPDFError, match=r"\.md"):
+        superpdf.extract_tables(one, work / "tables.txt", format="markdown")
+
+    (work / "notes.md").write_text("# Launch notes\n\nsuperPDF converts *Markdown* too.\n", encoding="utf-8")
+    assert superpdf.from_markdown(work / "notes.md", work / "notes.pdf", page_size="Letter")["pages"] == 1
+    assert "Launch notes" in superpdf.read_text(work / "notes.pdf")["pages"][0]["text"]
+    (work / "dot.png").write_bytes(_png())
+    assert superpdf.from_images([work / "dot.png", work / "dot.png"], work / "images.pdf")["pages"] == 2
+
+
+@pytest.mark.integration
+def test_editing_and_comparing_tools(work: Path) -> None:
+    one = work / "one.pdf"
+    superpdf.add_text(one, "Signed: Ada Lovelace", work / "signed.pdf", x=72, y=100)
+    assert "Signed: Ada Lovelace" in superpdf.read_text(work / "signed.pdf")["pages"][0]["text"]
+    assert superpdf.resize_pages(one, work / "crop.pdf", mode="crop", margin=36)["pages"] == 1
+    assert superpdf.resize_pages(one, work / "half.pdf", mode="scale", factor=0.5)["pages"] == 1
+    assert superpdf.flatten(one, work / "flat.pdf")["pages"] == 1
+    with pytest.raises(superpdf.SuperPDFError, match="Nope"):
+        superpdf.fill_form(one, {"Nope": "x"}, work / "filled.pdf")
+
+    same = superpdf.compare(one, one)
+    assert {p["status"] for p in same["pages"]} == {"same"}
+    longer = superpdf.compare(one, work / "three.pdf")
+    assert [p["status"] for p in longer["pages"]] == ["same", "added", "added"]
+    outline = superpdf.outline(one)
+    assert outline["format"] == "markdown" and "Quarterly report" in outline["content"]
+    assert json.loads(superpdf.outline(one, format="json")["content"]) == outline["sections"]
+
+
+def _png() -> bytes:
+    """A 2x2 white PNG."""
+    import struct
+    import zlib
+
+    def chunk(kind: bytes, data: bytes) -> bytes:
+        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data))
+
+    pixels = zlib.compress(b"\x00\xff\xff\xff\xff\xff\xff" * 2)
+    header = struct.pack(">IIBBBBB", 2, 2, 8, 2, 0, 0, 0)
+    return b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", header) + chunk(b"IDAT", pixels) + chunk(b"IEND", b"")
+
+
 OFFICE_DOCUMENT = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"
 
 
 def _minimal_docx(path: Path, text: str) -> None:
     """The smallest Word file LibreOffice opens: one paragraph."""
-    import zipfile
-
     with zipfile.ZipFile(path, "w") as docx:
         docx.writestr(
             "[Content_Types].xml",

@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.0
+
+- 12 new tools, in the CLI (`superpdf tool`), the MCP server, the local API and the Python package (30 in all):
+  - `pdf_to_docx`, `pdf_to_pptx`, `pdf_to_epub`: editable Word (headings, bold and italic, lists, tables; OCR for
+    scanned pages), PowerPoint with the text as text boxes, and EPUB 3 in chapters.
+  - `pdf_extract_tables`: tables, and charts drawn as vectors, as Excel (one sheet per table), CSV, JSON or Markdown.
+  - `pdf_from_images`, `pdf_from_markdown`: JPG and PNG images, or a Markdown file, to PDF.
+  - `pdf_fill_form`, `pdf_flatten`: fill form fields by name; make fields part of the page.
+  - `pdf_add_text`, `pdf_resize_pages`: draw text such as a typed signature; crop margins or scale pages.
+  - `pdf_compare`, `pdf_outline`: the words that changed between two versions, page by page; the outline with the
+    pages each section covers.
+- `pdf_add_page_labels` takes `position` (`top` or `bottom`, the default).
+- `openapi.json` is generated from the tool schemas with `npm run openapi`, and a test fails when it is out of date.
+  The published 0.2.0 file still listed version 0.1.0.
+
 ## 0.2.0
 
 - `superpdf tools` lists all 18 tools with their JSON input schemas; `superpdf tool <name> --input '<json>'` runs

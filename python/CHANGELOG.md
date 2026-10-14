@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0
+
+- 12 new functions, the new tools in `@superpdf/cli` 0.3.0: `to_docx`, `to_pptx`, `to_epub`, `extract_tables`,
+  `from_images`, `from_markdown`, `fill_form`, `flatten`, `add_text`, `resize_pages`, `compare` and `outline`, with
+  typed results (`WordResult`, `SlidesResult`, `EpubResult`, `TablesResult`, `Comparison`, `Outline`, `SavedFile`).
+- `add_page_labels` takes `position` (`"top"` or `"bottom"`).
+- `OfficeResult` is exported.
+- Tested on Python 3.15 as well.
+
 ## 0.2.0
 
 - Every superPDF tool as a typed Python function: `info`, `list_files`, `read_text`, `extract_structure`, `merge`,

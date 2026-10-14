@@ -25,9 +25,11 @@ You need Node.js 22 or later. The code is plain JavaScript (ES modules), with no
 |---|---|
 | `bin/` | The `superpdf` command |
 | `lib/` | The PDF reader and PDF operations: `pdf-structure.js`, `pdf-layout.js`, `pdf-charts.js`, `pdf-text-fixes.js`, `pdf-core.js` |
-| `contracts/` | The tool definitions shared by the CLI, the MCP server and the API |
+| `contracts/` | The tool definitions shared by the CLI, the MCP server, the API and the Python package. After changing one, run `npm run openapi` to rebuild `openapi.json` |
 | `mcp/` | The MCP server, including the folder rules for `--allow-dir` |
 | `api/` | The local REST API, jobs and webhooks |
+| `scripts/` | `openapi.js`, which writes `openapi.json` from the tool definitions |
+| `python/` | The Python package (`pip install superpdf`); see [python/README.md](python/README.md) |
 | `tests/` | End-to-end tests (`npm test`) |
 
 ## Pull requests
