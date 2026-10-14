@@ -38,6 +38,42 @@ You need Node.js 22 or later. The code is plain JavaScript (ES modules), with no
   licence (MIT, BSD, Apache-2.0) and be credited in NOTICE; copyleft code (GPL, AGPL, LGPL) can't be accepted.
 - By contributing, you agree that your contribution is licensed under Apache-2.0.
 
+## Releasing
+
+Maintainers publish from GitHub: publishing a release runs [`release.yml`](.github/workflows/release.yml), which runs
+the tests, checks that the tag matches `package.json`, and stages the package on npm with provenance through npm
+trusted publishing. No npm token is stored in the repository.
+
+1. Bump the version without creating a tag: `npm version 0.2.0 --no-git-tag-version` (use the next patch, minor or
+   major version).
+2. Add a section for the new version at the top of [CHANGELOG.md](CHANGELOG.md).
+3. Commit both files as `chore(release): 0.2.0`, push to `main` and wait for CI to pass.
+4. Tag and push the tag: `git tag -a v0.2.0 -m "superPDF AI 0.2.0"`, then `git push origin v0.2.0`.
+5. Create a GitHub release from that tag, with the changelog section as the notes, and publish it. Mark it as a
+   pre-release to publish under the `next` dist-tag instead of `latest`.
+6. When the Release workflow has finished, approve the staged version on npmjs.com (Staged Packages tab), or with
+   `npm stage list` and `npm stage approve <stage-id>`. Approval needs two-factor authentication.
+7. Check that `npm view @superpdf/cli version` shows the new version and that the package page shows its provenance.
+
+The tag must be `v` followed by the exact `package.json` version, or the workflow stops before publishing. A version
+can only be published once: if something is wrong after staging, reject the staged version and release the next patch
+version.
+
+### One-time npm setup
+
+On npmjs.com, open the `@superpdf/cli` package, then Settings, and add a trusted publisher for GitHub Actions:
+
+- Organization or user: `arjunprabhulal`
+- Repository: `superpdf`
+- Workflow filename: `release.yml`
+- Environment name: leave empty
+- Allowed actions: `npm stage publish` only (leave `npm publish` unchecked)
+
+npm doesn't check these values when you save them; a mistake shows up as an error when the workflow publishes. A new
+trusted publisher expires if it isn't used for a successful publish within two days, so add it shortly before a
+release. Once a release has gone through it, set Publishing access to "Require two-factor authentication and disallow
+tokens".
+
 ## Conduct
 
 Everyone taking part is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
