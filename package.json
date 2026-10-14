@@ -1,6 +1,6 @@
 {
   "name": "@superpdf/cli",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "superPDF AI on your computer: PDF tools for Terminal, scripts and AI agents (command-line tool, MCP server and local API)",
   "license": "Apache-2.0",
   "type": "module",

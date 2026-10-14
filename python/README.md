@@ -162,6 +162,8 @@ superpdf help
 
 `uvx superpdf …` and `pipx run superpdf …` run it in a temporary environment, with nothing to install first.
 
+<img src="https://raw.githubusercontent.com/arjunprabhulal/superpdf/main/docs/assets/cli-help.png" alt="uvx superpdf in a terminal: commands grouped under Read and convert, Edit pages, and For AI agents and code, then examples and notes" width="820">
+
 ## How it works
 
 Each call runs `superpdf export` in a subprocess (no shell) with the bundled Node.js and reads its output as UTF-8.

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1
+
+- `superpdf help` is reorganised: commands grouped under Read and convert, Edit pages, and For AI agents and code,
+  with aligned descriptions, examples and notes. Colour on a terminal only, off with `NO_COLOR` (on with `FORCE_COLOR`).
+- The help no longer says "all 18 tools"; a test keeps any tool count out of it.
+
 ## 0.3.0
 
 - 12 new tools, in the CLI (`superpdf tool`), the MCP server, the local API and the Python package (30 in all):
