@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Homebrew: `brew install arjunprabhulal/superpdf/superpdf` (macOS and Linux, prebuilt for Apple silicon and Linux).
+- `integrations/`: `langchain-superpdf` and `llama-index-readers-superpdf` packages.
+
 ## 0.3.1
 
 - `superpdf help` is reorganised: commands grouped under Read and convert, Edit pages, and For AI agents and code,
