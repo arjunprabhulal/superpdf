@@ -5,13 +5,13 @@ build-backend = "hatchling.build"
 [project]
 name = "superpdf"
 dynamic = ["version"]
-description = "PDFs to Markdown, HTML or JSON on your computer: headings, tables, charts as data and OCR. Python wrapper for the superPDF CLI."
+description = "superPDF AI for Python: PDF to Markdown, Word, Excel and JSON, forms, merge, compare and OCR, on your computer."
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 authors = [{ name = "Arjun Prabhulal", email = "arjun.prabhulal@gmail.com" }]
-keywords = ["pdf", "pdf-to-markdown", "pdf-parser", "ocr", "tables", "charts", "rag", "langchain", "llama-index"]
+keywords = ["pdf", "pdf-ai", "superpdf", "superpdf-ai", "pdf-to-markdown", "pdf-to-word", "pdf-to-excel", "pdf-parser", "ocr", "tables", "charts", "rag", "langchain", "llama-index"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
@@ -43,7 +43,7 @@ superpdf = "superpdf.__main__:main"
 
 [project.urls]
 Homepage = "https://superpdf.ai"
-Documentation = "https://github.com/arjunprabhulal/superpdf/tree/main/python#readme"
+Documentation = "https://superpdf.ai/docs/python"
 Source = "https://github.com/arjunprabhulal/superpdf"
 Issues = "https://github.com/arjunprabhulal/superpdf/issues"
 Changelog = "https://github.com/arjunprabhulal/superpdf/blob/main/python/CHANGELOG.md"
