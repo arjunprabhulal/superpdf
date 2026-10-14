@@ -21,7 +21,7 @@
 
 <br><br>
 
-<img src="docs/assets/hero.png" alt="A report PDF with a heading, a table and a bar chart, and the Markdown superPDF writes from it: the heading levels, the table and the chart's values as a table" width="1000">
+<img src="docs/assets/hero.png" alt="Input: a one-page report PDF with a table and a bar chart. Output: the Markdown superPDF writes from it, with the heading levels, the table, and the chart's values as a table" width="1000">
 
 </div>
 
