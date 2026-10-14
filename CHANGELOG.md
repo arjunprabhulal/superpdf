@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3-rc.0 (pre-release)
+
+- Same code as 0.1.2, published from GitHub Actions to test the release workflow. Installed only with `@superpdf/cli@next`.
+
 ## 0.1.2
 
 - Tables: a data row whose numbers are one digit longer than the rows below is no longer marked as a header row in HTML output (`--tables html` and the HTML export).
