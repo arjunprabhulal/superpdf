@@ -15,7 +15,7 @@
 
 **[Website](https://superpdf.ai) · [Docs](https://superpdf.ai/docs/mcp-api/command-line-tools) · [Benchmark](https://superpdf.ai/performance) · [Changelog](CHANGELOG.md)**
 
-[Quick start](#quick-start) · [MCP tools](#mcp-tools) · [How it compares](#how-it-compares) · [How it works](#how-it-works)
+[How it compares](#how-it-compares) · [Quick start](#quick-start) · [MCP tools](#mcp-tools) · [How it works](#how-it-works)
 
 <code>npx @superpdf/cli export report.pdf --output report.md</code>
 
@@ -34,6 +34,26 @@ into the numbers they were drawn from. Scanned pages are read with OCR in 15 lan
 It runs on your computer as a command, as an MCP server for AI assistants such as Claude Code, Cursor and Codex, or as a
 local REST API for your own scripts. Files never leave the folders you allow. It is the same reader that powers
 [superpdf.ai](https://superpdf.ai) in the browser.
+
+## How it compares
+
+On [ParseBench](https://www.parsebench.ai), in **our own run** of its open-source test suite on all 2,078 documents,
+superPDF scores **65.0** overall (64.8 on documents it was never tuned on). It is not on the official leaderboard yet.
+The other scores are a selection from the public leaderboard (October 12, 2026).
+
+| Parser | Overall | Tables | Charts | Content | Formatting | Grounding |
+|---|---|---|---|---|---|---|
+| LlamaParse Agentic Plus (paid service) | 90.2 | 93.4 | 94.2 | 92.3 | 87.1 | 84.1 |
+| Claude Opus 5.5 (AI model) | 78.0 | 93.9 | 64.1 | 91.8 | 77.0 | 63.2 |
+| **superPDF** (no language model, our run) | **65.0** | 68.4 | 52.2 | 80.5 | 62.3 | 61.5 |
+| Azure Document Intelligence | 59.6 | 86.0 | 1.6 | 84.9 | 51.9 | 73.8 |
+| Docling | 50.6 | 66.4 | 52.8 | 66.9 | 1.0 | 66.1 |
+| Google Cloud Document AI | 50.4 | 55.1 | 1.4 | 83.7 | 50.5 | 61.3 |
+| AWS Textract | 47.9 | 84.6 | 6.0 | 74.8 | 3.7 | 70.4 |
+
+Compared with the Azure, Google and AWS services, superPDF scores much higher on charts and higher on formatting; Azure and
+Textract score higher on tables. LlamaParse and Claude Opus 5.5 score higher overall. Full table and method:
+[superpdf.ai/performance](https://superpdf.ai/performance).
 
 ## Quick start
 
@@ -156,26 +176,6 @@ approaches tend to lose:
   language tag or the text itself, and a poor reading is retried with Sauvola thresholding.
 - **Tables three ways.** Ruled lines, lines found in the pixels of scanned pages, and borderless tables from aligned
   columns of text (on pages with a text layer).
-
-## How it compares
-
-On [ParseBench](https://www.parsebench.ai), in **our own run** of its open-source test suite on all 2,078 documents,
-superPDF scores **65.0** overall (64.8 on documents it was never tuned on). It is not on the official leaderboard yet.
-The other scores are a selection from the public leaderboard (October 12, 2026).
-
-| Parser | Overall | Tables | Charts | Content | Formatting | Grounding |
-|---|---|---|---|---|---|---|
-| LlamaParse Agentic Plus (paid service) | 90.2 | 93.4 | 94.2 | 92.3 | 87.1 | 84.1 |
-| Claude Opus 5.5 (AI model) | 78.0 | 93.9 | 64.1 | 91.8 | 77.0 | 63.2 |
-| **superPDF** (no language model, our run) | **65.0** | 68.4 | 52.2 | 80.5 | 62.3 | 61.5 |
-| Azure Document Intelligence | 59.6 | 86.0 | 1.6 | 84.9 | 51.9 | 73.8 |
-| Docling | 50.6 | 66.4 | 52.8 | 66.9 | 1.0 | 66.1 |
-| Google Cloud Document AI | 50.4 | 55.1 | 1.4 | 83.7 | 50.5 | 61.3 |
-| AWS Textract | 47.9 | 84.6 | 6.0 | 74.8 | 3.7 | 70.4 |
-
-Compared with the Azure, Google and AWS services, superPDF scores much higher on charts and higher on formatting; Azure and
-Textract score higher on tables. LlamaParse and Claude Opus 5.5 score higher overall. Full table and method:
-[superpdf.ai/performance](https://superpdf.ai/performance).
 
 ## How it works
 
