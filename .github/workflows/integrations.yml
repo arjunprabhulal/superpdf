@@ -57,8 +57,10 @@ jobs:
       - run: npm ci
         working-directory: .
       - run: uv sync --locked
+      # Network blocked, as LangChain runs unit tests. Not on Windows: asyncio's event loop opens a local socket
+      # pair there, which the block refuses. The next step runs every test on every system.
       - name: Unit tests (no network)
-        if: matrix.package == 'langchain-superpdf'
+        if: matrix.package == 'langchain-superpdf' && runner.os != 'Windows'
         run: uv run pytest -q -rs tests/unit_tests --disable-socket --allow-unix-socket
       - run: uv run pytest -q -rs
 
