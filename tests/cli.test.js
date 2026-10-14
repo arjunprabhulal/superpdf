@@ -6,11 +6,12 @@ import { mkdtemp, writeFile, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
+import { fileURLToPath } from 'node:url';
 import { randomBytes } from 'node:crypto';
 import { PDFDocument, StandardFonts, degrees } from 'pdf-lib';
 
 const run = promisify(execFile);
-const BIN = new URL('../bin/superpdf.js', import.meta.url).pathname;
+const BIN = fileURLToPath(new URL('../bin/superpdf.js', import.meta.url));
 const cli = (args, cwd) => run(process.execPath, [BIN, ...args], { cwd });
 
 async function samplePdf(dir, name, pages, title = 'Report') {
@@ -27,6 +28,16 @@ async function samplePdf(dir, name, pages, title = 'Report') {
 }
 
 const workdir = async () => mkdtemp(join(tmpdir(), 'superpdf-test-'));
+
+test('PDF.js data folders end in / on every platform, Windows paths included', async () => {
+  const { pdfjsResources } = await import('../lib/pdf-node.js');
+  const windows = pdfjsResources('C:\\Users\\me\\node_modules\\pdfjs-dist', '\\');
+  assert.equal(windows.cMapUrl, 'C:/Users/me/node_modules/pdfjs-dist/cmaps/');
+  assert.equal(windows.standardFontDataUrl, 'C:/Users/me/node_modules/pdfjs-dist/standard_fonts/');
+  for (const value of Object.values(pdfjsResources())) {
+    if (typeof value === 'string') assert.ok(value.endsWith('/') && !value.includes('\\'), value);
+  }
+});
 
 test('version and help', async () => {
   const { version } = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
@@ -67,7 +78,7 @@ test('outputs are never overwritten and missing files are explained', async () =
   await samplePdf(dir, 'a.pdf', 1);
   await cli(['merge', 'a.pdf', 'a.pdf', '--output', 'm.pdf'], dir);
   await assert.rejects(cli(['merge', 'a.pdf', 'a.pdf', '--output', 'm.pdf'], dir), /already exists/);
-  await assert.rejects(cli(['info', 'nope.pdf'], dir), /No file at nope\.pdf/);
+  await assert.rejects(cli(['info', 'nope.pdf'], dir), /No file at (.*[\\/])?nope\.pdf\./);
 });
 
 test('MCP server lists its tools and reads only inside --allow-dir', async () => {
