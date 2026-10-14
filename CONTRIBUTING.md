@@ -30,6 +30,7 @@ You need Node.js 22 or later. The code is plain JavaScript (ES modules), with no
 | `api/` | The local REST API, jobs and webhooks |
 | `scripts/` | `openapi.js`, which writes `openapi.json` from the tool definitions |
 | `python/` | The Python package (`pip install superpdf`); see [python/README.md](python/README.md) |
+| `integrations/` | `langchain-superpdf` (LangChain document loader) and `llama-index-readers-superpdf` (LlamaIndex reader), each its own PyPI package |
 | `tests/` | End-to-end tests (`npm test`) |
 
 ## Pull requests

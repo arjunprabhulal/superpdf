@@ -4,13 +4,33 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 14
     open-pull-requests-limit: 5
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 14
   - package-ecosystem: uv
     directory: /python
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 14
+    open-pull-requests-limit: 5
+  - package-ecosystem: uv
+    directory: /integrations/langchain-superpdf
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    open-pull-requests-limit: 5
+  - package-ecosystem: uv
+    directory: /integrations/llama-index-readers-superpdf
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
     open-pull-requests-limit: 5

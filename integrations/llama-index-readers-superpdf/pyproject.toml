@@ -1,0 +1,78 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "llama-index-readers-superpdf"
+version = "0.1.0"
+description = "LlamaIndex reader for superPDF AI: local PDFs as Markdown with tables, charts as data and OCR."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "Arjun Prabhulal", email = "arjun.prabhulal@gmail.com" }]
+keywords = ["llama-index", "reader", "pdf", "pdf-ai", "superpdf", "pdf-to-markdown", "rag", "ocr"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: Microsoft :: Windows",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Typing :: Typed",
+]
+dependencies = ["llama-index-core>=0.13.0,<0.15", "superpdf>=0.3.1,<1.0.0"]
+
+[project.urls]
+Homepage = "https://superpdf.ai"
+Documentation = "https://superpdf.ai/docs/python/langchain-llamaindex"
+Source = "https://github.com/arjunprabhulal/superpdf/tree/main/integrations/llama-index-readers-superpdf"
+Issues = "https://github.com/arjunprabhulal/superpdf/issues"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.11"]
+
+[tool.uv.sources]
+# Develop against this repository's superpdf package; the published wheel depends on superpdf from PyPI.
+superpdf = { path = "../../python", editable = true }
+
+[tool.hatch.build.targets.wheel]
+include = ["llama_index/"]
+
+[tool.hatch.build.targets.sdist]
+include = ["llama_index/"]
+
+[tool.llamahub]
+contains_example = false
+import_path = "llama_index.readers.superpdf"
+
+[tool.llamahub.class_authors]
+SuperPDFReader = "arjunprabhulal"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: runs the real superPDF CLI (needs Node.js 22+)"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+namespace_packages = true
+explicit_package_bases = true
+
+[tool.ruff.lint.isort]
+known-third-party = ["superpdf"]
