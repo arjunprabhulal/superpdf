@@ -50,5 +50,9 @@
   "devDependencies": {
     "@tesseract.js-data/eng": "1.0.0",
     "zod-openapi": "6.0.2"
+  },
+  "author": {
+    "name": "Arjun Prabhulal",
+    "url": "https://arjunprabhulal.com"
   }
 }

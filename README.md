@@ -15,7 +15,7 @@
 
 **[Website](https://superpdf.ai) · [Docs](https://superpdf.ai/docs/mcp-api/command-line-tools) · [Benchmark](https://superpdf.ai/performance) · [Changelog](CHANGELOG.md)**
 
-[Quick start](#quick-start) · [What it reads](#what-it-reads) · [Commands](#commands) · [MCP tools](#mcp-tools) · [How it compares](#how-it-compares) · [How it works](#how-it-works) · [Privacy and security](#privacy-and-security)
+[Quick start](#quick-start) · [What it reads](#what-it-reads) · [Commands](#commands) · [MCP tools](#mcp-tools) · [What makes it different](#what-makes-it-different) · [How it compares](#how-it-compares) · [How it works](#how-it-works) · [Privacy and security](#privacy-and-security)
 
 <code>npx @superpdf/cli export report.pdf --output report.md</code>
 
@@ -92,10 +92,10 @@ This starts a private API on `127.0.0.1` that only this computer can reach. It p
 
 | Part of the PDF | How superPDF reads it |
 |---|---|
-| **Tables** | Ruled tables from their lines, borderless tables from aligned text, header rows and merged cells |
+| **Tables** | Ruled tables from their lines and shaded rows, borderless tables from aligned text; `--tables html` keeps merged header cells |
 | **Charts** | Bar, line and pie charts drawn as shapes, turned into tables of values (marked as measured, so approximate) |
 | **Structure** | Headings and their levels, paragraphs, lists, bold and italic text, page headers and footers |
-| **Reading order** | Columns, side panels and footnotes in the order a person reads them |
+| **Reading order** | Multi-column pages split at their column gaps, so the text reads in order |
 | **Scans** | Pages without a text layer are read with Tesseract OCR in English and 14 other languages; the language data is bundled, so nothing is downloaded |
 | **Big files** | No file size or page limit |
 
@@ -129,6 +129,30 @@ Try them on [`examples/quarterly-report.pdf`](examples/quarterly-report.pdf).
 | `pdf_protect`, `pdf_unlock`, `pdf_remove_metadata`, `pdf_repair` | AES-256 passwords, clean properties, fix damaged files |
 | `pdf_from_office` | Word, Excel and PowerPoint to PDF (needs LibreOffice) |
 | `pdf_run_pipeline`, `pdf_run_batch` | Up to 10 steps on one PDF, or the same steps on up to 50 PDFs |
+
+## What makes it different
+
+Most PDF-to-text tools take the text layer and sort it by position, or run an AI model on a picture of the page.
+superPDF works from the PDF's own drawing instructions, which keeps exact text and positions and recovers things both
+approaches tend to lose:
+
+- **Charts become data.** Bars, lines, dots, areas and pie slices are drawn as shapes; `pdf-charts.js` measures them
+  against the axis labels (or, without an axis, against the values printed on the bars) and matches series to their
+  legend colours. Charts saved as pictures fall back to reading the bars' pixels.
+- **Lost letters are recovered.** When a font has no proper Unicode table, PDF.js reads its letters as spaces.
+  `pdf-text-fixes.js` matches each glyph's outline against letters it has already identified, and checks TrueType
+  fonts against the standard Mac glyph order, then puts the letters back.
+- **Bold is measured, not guessed.** Font names are often hidden (`F1`, `g_d0_f2`), so `pdf-structure.js` measures the
+  glyphs' stroke thickness, compares the widths of two cuts of one font, and detects text drawn twice or outlined to
+  look bold. On scans it measures the ink thickness of each word.
+- **Spacing and hidden text are fixed.** False spaces that PDF.js inserts in letter-spaced words and around Chinese
+  and Japanese characters are removed by measuring the glyphs the page draws, text the author cropped away (clipped)
+  is left out, and Arabic lam-alef ligatures that come out with their letters swapped are corrected.
+- **OCR only where it's needed.** Whole scanned pages, pages whose font encoding is garbled, and pictures that contain
+  text (checked first for letter-like shapes, so photos don't produce noise). The language comes from the PDF's
+  language tag or the text itself, and a poor reading is retried with Sauvola thresholding.
+- **Tables three ways.** Ruled lines and shaded rows, lines found in the pixels of scanned pages, and borderless tables
+  from aligned columns of text.
 
 ## How it compares
 
