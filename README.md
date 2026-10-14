@@ -47,7 +47,7 @@ The other scores are a selection from the public leaderboard (October 12, 2026).
 | Claude Opus 5.5 (AI model) | 78.0 | 93.9 | 64.1 | 91.8 | 77.0 | 63.2 |
 | **superPDF** (no language model, our run) | **65.0** | 68.4 | 52.2 | 80.5 | 62.3 | 61.5 |
 | Azure Document Intelligence | 59.6 | 86.0 | 1.6 | 84.9 | 51.9 | 73.8 |
-| Docling | 50.6 | 66.4 | 52.8 | 66.9 | 1.0 | 66.1 |
+| Docling (docling-models) | 50.6 | 66.4 | 52.8 | 66.9 | 1.0 | 66.1 |
 | Google Cloud Document AI | 50.4 | 55.1 | 1.4 | 83.7 | 50.5 | 61.3 |
 | AWS Textract | 47.9 | 84.6 | 6.0 | 74.8 | 3.7 | 70.4 |
 
