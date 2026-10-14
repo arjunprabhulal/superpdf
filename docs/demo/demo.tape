@@ -6,9 +6,9 @@
 Output docs/assets/demo.gif
 
 Set Shell "bash"
-Set FontSize 18
-Set Width 1600
-Set Height 900
+Set FontSize 20
+Set Width 1240
+Set Height 820
 Set Padding 18
 Set Theme "GitHub Dark"
 Set WindowBar Colorful
