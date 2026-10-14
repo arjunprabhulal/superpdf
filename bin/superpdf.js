@@ -11,7 +11,7 @@ const useColor=process.env.FORCE_COLOR?process.env.FORCE_COLOR!=='0':!!process.s
 const paint=code=>text=>useColor?`\x1b[${code}m${text}\x1b[0m`:text;
 const bold=paint('1'),dim=paint('2'),green=paint('32'),cyan=paint('36');
 const section=(title,rows)=>`${bold(title)}\n${rows.map(([name,about])=>`  ${cyan(name.padEnd(10))}${about}`).join('\n')}`;
-const helpText=version=>`${bold('superPDF')} ${dim(version)}  PDF tools on your computer. Nothing is uploaded.
+const helpText=version=>`${bold('superPDF AI')} ${dim(version)}  PDF tools on your computer. Nothing is uploaded.
 
 ${bold('Usage:')} superpdf <command> [options]
 
@@ -43,7 +43,7 @@ ${bold('Examples')}
   ${green('superpdf extract report.pdf --pages 1,3-5 --output part.pdf')}
   ${green('superpdf rotate scan.pdf --pages 2 --angle 90 --output upright.pdf')}
   ${green('superpdf tool pdf_to_docx --input \'{"input":"report.pdf","output":"report.docx"}\'')}
-  ${green('superpdf mcp --allow-dir ~/Documents/PDFs')}
+  ${green('superpdf mcp --allow-dir ~/Documents/superPDF')}
 
 ${bold('Notes')}
   ${dim('•')} Outputs are always new files; existing files are never overwritten.
@@ -53,7 +53,9 @@ ${bold('Notes')}
   ${dim('•')} convert: brew install --cask libreoffice, or set SUPERPDF_SOFFICE to its soffice path.
   ${dim('•')} audio: --pages, --voice (list them with say -v '?'), --speed slower|faster.
 
-${dim('Docs:')} https://superpdf.ai/docs/mcp-api/command-line-tools
+${dim('Docs:')}   https://superpdf.ai/docs/mcp-api/command-line-tools
+${dim('Python:')} pip install superpdf, or uvx superpdf (https://superpdf.ai/docs/python)
+${dim('Source:')} https://github.com/arjunprabhulal/superpdf
 `;
 /**
  * Markdown as toMarkdown (lib/pdf-structure.js) writes it, with each table as the HTML export's table (colspans and
