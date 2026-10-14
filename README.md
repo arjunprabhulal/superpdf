@@ -39,11 +39,14 @@ that powers [superpdf.ai](https://superpdf.ai) in the browser.
 | Use it as | Install or run | Docs |
 |---|---|---|
 | Command line | `npm install -g @superpdf/cli`, or `npx @superpdf/cli …` without installing | [CLI](https://superpdf.ai/docs/mcp-api/command-line-tools) |
+| Command line with Homebrew | `brew install arjunprabhulal/superpdf/superpdf` | [Tap](https://github.com/arjunprabhulal/homebrew-superpdf) |
 | MCP server for AI assistants | `superpdf mcp --allow-dir ~/Documents/superPDF` | [MCP setup](https://superpdf.ai/docs/mcp-api/mcp-tool-access) |
 | Local REST API (OpenAPI 3.1) | `superpdf serve --allow-dir ~/Documents/superPDF` | [API](https://superpdf.ai/docs/api) |
 | Python SDK | `pip install superpdf` or `uv add superpdf` | [Python](https://superpdf.ai/docs/python) |
 | Python, without installing | `uvx superpdf …` or `pipx run superpdf …` | [Python](https://superpdf.ai/docs/python#command) |
-| LangChain and LlamaIndex | `pip install "superpdf[langchain]"` or `"superpdf[llama-index]"` | [Loaders](https://superpdf.ai/docs/python/langchain-llamaindex) |
+| LangChain | `pip install langchain-superpdf` | [Loader](https://superpdf.ai/docs/python/langchain-llamaindex#langchain) |
+| LlamaIndex | `pip install llama-index-readers-superpdf` | [Reader](https://superpdf.ai/docs/python/langchain-llamaindex#llamaindex) |
+| LangGraph agents | the MCP server through `langchain-mcp-adapters` | [Agents](https://superpdf.ai/docs/python/langchain-llamaindex#langchain-agents) |
 
 ## How it compares
 
@@ -80,6 +83,12 @@ npx downloads the tool once and runs it. To install the `superpdf` command for r
 ```bash
 npm install -g @superpdf/cli
 superpdf help
+```
+
+Or with Homebrew on macOS or Linux, which brings its own Node.js:
+
+```bash
+brew install arjunprabhulal/superpdf/superpdf
 ```
 
 ### Use it from your AI assistant (MCP)

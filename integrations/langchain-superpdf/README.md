@@ -39,16 +39,22 @@ docs[0].metadata
 | `ocr=False` | Skip OCR on scanned pages |
 | `timeout=1200` | Seconds before giving up on one PDF (default 600) |
 
-Several files at once: `SuperPDFLoader(["a.pdf", "b.pdf"])`. For a folder, or PDFs that arrive as bytes, use the
-parser with any blob loader:
+Several files at once: `SuperPDFLoader(["a.pdf", "b.pdf"])`. A folder:
 
 ```python
-from langchain_community.document_loaders.generic import GenericLoader
+from pathlib import Path
+
+docs = SuperPDFLoader(sorted(Path("papers").glob("**/*.pdf"))).load()
+```
+
+PDFs that arrive as bytes, such as uploads, go through the parser:
+
+```python
+from langchain_core.documents.base import Blob
 from langchain_superpdf import SuperPDFParser
 
-docs = GenericLoader.from_filesystem(
-    "papers", glob="**/*.pdf", parser=SuperPDFParser()
-).load()
+blob = Blob.from_data(pdf_bytes, path="upload.pdf")
+docs = list(SuperPDFParser().lazy_parse(blob))
 ```
 
 ## Split by section
