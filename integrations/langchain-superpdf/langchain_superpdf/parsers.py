@@ -4,30 +4,41 @@ from __future__ import annotations
 
 import os
 import tempfile
-from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import Any, Literal
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Literal
 
 import superpdf
 from langchain_core.document_loaders import BaseBlobParser
 from langchain_core.documents import Document
-from langchain_core.documents.base import Blob
 
-DEFAULT_PAGES_DELIMITER = "\n\f"  # the same as LangChain's own PDF parsers
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from langchain_core.documents.base import Blob
+
+# The same delimiter as LangChain's own PDF parsers.
+DEFAULT_PAGES_DELIMITER = "\n\f"
+_MODES = ("page", "single")
+_TABLES = ("markdown", "html")
 
 
 class SuperPDFParser(BaseBlobParser):
     """Parse PDF blobs into Markdown Documents with superPDF AI, on your computer.
 
-    Use it with ``GenericLoader`` or any blob loader. ``SuperPDFLoader`` uses it for local files.
+    Use it with ``GenericLoader`` or any blob loader; ``SuperPDFLoader`` uses it
+    for local files.
 
-    .. code-block:: python
+    Example:
+        .. code-block:: python
 
-        from langchain_community.document_loaders.generic import GenericLoader
-        from langchain_superpdf import SuperPDFParser
+            from langchain_community.document_loaders.generic import GenericLoader
+            from langchain_superpdf import SuperPDFParser
 
-        loader = GenericLoader.from_filesystem("papers", glob="**/*.pdf", parser=SuperPDFParser())
-        docs = loader.load()
+            loader = GenericLoader.from_filesystem(
+                "papers", glob="**/*.pdf", parser=SuperPDFParser()
+            )
+            docs = loader.load()
     """
 
     def __init__(
@@ -43,17 +54,23 @@ class SuperPDFParser(BaseBlobParser):
         """Initialize the parser.
 
         Args:
-            mode: ``"page"`` for one Document per page (the default), ``"single"`` for one per PDF.
+            mode: ``"page"`` for one Document per page (the default), or
+                ``"single"`` for one Document per PDF.
             pages_delimiter: Text placed between pages in ``"single"`` mode.
             pages: Pages to read, such as ``"1, 3-5"``; all pages when omitted.
             tables: ``"html"`` writes tables as HTML, keeping merged header cells.
             ocr: Read scanned pages (pages without a text layer) with OCR.
             timeout: Seconds before giving up on one PDF.
+
+        Raises:
+            ValueError: If ``mode`` or ``tables`` is not one of its values.
         """
-        if mode not in ("page", "single"):
-            raise ValueError(f'mode must be "page" or "single", not {mode!r}')
-        if tables not in ("markdown", "html"):
-            raise ValueError(f'tables must be "markdown" or "html", not {tables!r}')
+        if mode not in _MODES:
+            msg = f'mode must be "page" or "single", not {mode!r}'
+            raise ValueError(msg)
+        if tables not in _TABLES:
+            msg = f'tables must be "markdown" or "html", not {tables!r}'
+            raise ValueError(msg)
         self.mode = mode
         self.pages_delimiter = pages_delimiter
         self.pages = pages
@@ -62,7 +79,14 @@ class SuperPDFParser(BaseBlobParser):
         self.timeout = timeout
 
     def lazy_parse(self, blob: Blob) -> Iterator[Document]:
-        """Read one PDF: one Document per page, or one for the whole PDF with ``mode="single"``."""
+        """Read one PDF: one Document per page, or one with ``mode="single"``.
+
+        Args:
+            blob: The PDF, as a file path or bytes.
+
+        Yields:
+            Documents with LangChain's standard PDF metadata.
+        """
         source = str(blob.source or blob.path or "")
         with _local_file(blob) as path:
             info = superpdf.info(path)
@@ -79,15 +103,21 @@ class SuperPDFParser(BaseBlobParser):
             yield Document(page_content=text, metadata=metadata)
             return
         for page in read:
+            number = page["page"]
             yield Document(
                 page_content=page["markdown"],
-                metadata={**metadata, "page": page["page"] - 1, "page_label": str(page["page"])},
+                metadata={**metadata, "page": number - 1, "page_label": str(number)},
             )
 
 
 def _document_metadata(source: str, info: superpdf.PdfInfo) -> dict[str, Any]:
-    """LangChain's standard PDF metadata: source, total_pages, creationdate, creator and producer, plus any
-    title, author, subject and keywords the PDF sets. superPDF doesn't report dates, so creationdate is empty."""
+    """LangChain's standard PDF metadata for one PDF.
+
+    The standard keys (source, total_pages, creationdate, creator and producer),
+    plus any title, author, subject and keywords the PDF sets. superPDF doesn't
+    report dates, so creationdate is empty, as LangChain's parsers leave it when
+    a PDF has none.
+    """
     metadata: dict[str, Any] = {
         "source": source,
         "total_pages": info.get("pages", 0),
@@ -104,14 +134,15 @@ def _document_metadata(source: str, info: superpdf.PdfInfo) -> dict[str, Any]:
 
 @contextmanager
 def _local_file(blob: Blob) -> Iterator[str]:
-    """A path to the blob's bytes: its own file when it has one, else a temporary copy (deleted afterwards)."""
-    if blob.path is not None and blob.data is None and os.path.isfile(blob.path):
+    """A path to the blob's PDF: its own file, or a temporary copy of its bytes."""
+    if blob.path is not None and blob.data is None and Path(blob.path).is_file():
         yield os.fspath(blob.path)
         return
-    handle, path = tempfile.mkstemp(suffix=".pdf")
+    handle, name = tempfile.mkstemp(suffix=".pdf")
+    path = Path(name)
     try:
         with os.fdopen(handle, "wb") as file:
             file.write(blob.as_bytes())
-        yield path
+        yield name
     finally:
-        os.unlink(path)
+        path.unlink(missing_ok=True)

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "llama-index-readers-superpdf"
-dynamic = ["version"]
+version = "0.1.0"
 description = "LlamaIndex reader for superPDF AI: local PDFs as Markdown with tables, charts as data and OCR."
 readme = "README.md"
 license = "Apache-2.0"
@@ -28,7 +28,7 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
   "Typing :: Typed",
 ]
-dependencies = ["llama-index-core>=0.12,<0.15", "superpdf>=0.3.1,<1"]
+dependencies = ["llama-index-core>=0.13.0,<0.15", "superpdf>=0.3.1,<1.0.0"]
 
 [project.urls]
 Homepage = "https://superpdf.ai"
@@ -43,14 +43,11 @@ dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.11"]
 # Develop against this repository's superpdf package; the published wheel depends on superpdf from PyPI.
 superpdf = { path = "../../python", editable = true }
 
-[tool.hatch.version]
-path = "llama_index/readers/superpdf/__init__.py"
-
 [tool.hatch.build.targets.wheel]
 include = ["llama_index/"]
 
 [tool.hatch.build.targets.sdist]
-include = ["llama_index/", "tests", "README.md", "CHANGELOG.md", "LICENSE"]
+include = ["llama_index/"]
 
 [tool.llamahub]
 contains_example = false

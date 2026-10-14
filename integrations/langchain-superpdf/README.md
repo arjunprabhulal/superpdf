@@ -46,7 +46,9 @@ parser with any blob loader:
 from langchain_community.document_loaders.generic import GenericLoader
 from langchain_superpdf import SuperPDFParser
 
-docs = GenericLoader.from_filesystem("papers", glob="**/*.pdf", parser=SuperPDFParser()).load()
+docs = GenericLoader.from_filesystem(
+    "papers", glob="**/*.pdf", parser=SuperPDFParser()
+).load()
 ```
 
 ## Split by section
@@ -77,7 +79,13 @@ client = MultiServerMCPClient(
     {
         "superpdf": {
             "command": "npx",
-            "args": ["-y", "@superpdf/cli", "mcp", "--allow-dir", "/Users/you/Documents/superPDF"],
+            "args": [
+                "-y",
+                "@superpdf/cli",
+                "mcp",
+                "--allow-dir",
+                "/Users/you/Documents/superPDF",
+            ],
             "transport": "stdio",
         }
     }

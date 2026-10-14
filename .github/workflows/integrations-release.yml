@@ -33,11 +33,10 @@ jobs:
           package="${TAG%-v*}"
           tag_version="${TAG##*-v}"
           case "$package" in
-            langchain-superpdf) init=integrations/langchain-superpdf/langchain_superpdf/__init__.py ;;
-            llama-index-readers-superpdf) init=integrations/llama-index-readers-superpdf/llama_index/readers/superpdf/__init__.py ;;
+            langchain-superpdf|llama-index-readers-superpdf) ;;
             *) echo "::error::Unknown package in tag $TAG"; exit 1 ;;
           esac
-          version="$(sed -nE 's/^__version__ = "(.+)"$/\1/p' "$init")"
+          version="$(uv run --no-project --python 3.13 python -c "import tomllib;print(tomllib.load(open('integrations/$package/pyproject.toml','rb'))['project']['version'])")"
           if [ "$tag_version" != "$version" ]; then
             echo "::error::Tag $TAG does not match $package $version"
             exit 1

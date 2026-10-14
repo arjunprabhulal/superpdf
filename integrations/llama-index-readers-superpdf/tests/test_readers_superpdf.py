@@ -7,7 +7,7 @@ import pytest
 from llama_index.core import SimpleDirectoryReader
 from llama_index.core.readers.base import BaseReader
 
-from llama_index.readers.superpdf import SuperPDFReader, __version__
+from llama_index.readers.superpdf import SuperPDFReader
 from tests.conftest import FakeSuperPDF
 
 
@@ -20,7 +20,7 @@ def _pdf(folder: Path, name: str = "report.pdf") -> Path:
 def test_class() -> None:
     names_of_base_classes = [b.__name__ for b in SuperPDFReader.__mro__]
     assert BaseReader.__name__ in names_of_base_classes
-    assert SuperPDFReader.class_name() == "SuperPDFReader" and __version__
+    assert SuperPDFReader.class_name() == "SuperPDFReader"
 
 
 def test_one_document_per_page_with_page_label_and_file_name(fake: FakeSuperPDF, tmp_path: Path) -> None:
