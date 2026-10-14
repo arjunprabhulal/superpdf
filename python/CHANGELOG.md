@@ -1,8 +1,10 @@
 # Changelog
 
-## 0.3.0
+## 0.3.1
 
-- 12 new functions, the new tools in `@superpdf/cli` 0.3.0: `to_docx`, `to_pptx`, `to_epub`, `extract_tables`,
+The first 0.3 release on PyPI, numbered to match `@superpdf/cli` 0.3.1 (0.3.0 was never published).
+
+- 12 new functions, the tools added in `@superpdf/cli` 0.3.0: `to_docx`, `to_pptx`, `to_epub`, `extract_tables`,
   `from_images`, `from_markdown`, `fill_form`, `flatten`, `add_text`, `resize_pages`, `compare` and `outline`, with
   typed results (`WordResult`, `SlidesResult`, `EpubResult`, `TablesResult`, `Comparison`, `Outline`, `SavedFile`).
 - `add_page_labels` takes `position` (`"top"` or `"bottom"`).

@@ -2,6 +2,8 @@
 
 [![PyPI](https://img.shields.io/pypi/v/superpdf?style=flat-square&color=4338ca)](https://pypi.org/project/superpdf/) [![Python](https://img.shields.io/pypi/pyversions/superpdf?style=flat-square)](https://pypi.org/project/superpdf/) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-555555?style=flat-square)](LICENSE)
 
+**[superpdf.ai](https://superpdf.ai) · [Python docs](https://superpdf.ai/docs/python) · [GitHub](https://github.com/arjunprabhulal/superpdf) · [Changelog](https://github.com/arjunprabhulal/superpdf/blob/main/python/CHANGELOG.md)**
+
 Read, convert, edit and compare PDFs on your computer: Markdown, HTML or JSON with headings, tables, charts as data
 and OCR for scanned pages; Word, PowerPoint, Excel and EPUB; forms, signatures, merging and splitting. Nothing is
 uploaded.
@@ -16,7 +18,7 @@ numbers, watermark, protect, compare, Office to PDF, pipelines and batches), and
 Python 3.10 or later on macOS, Linux or Windows. Nothing else: Node.js comes with the package through
 [`nodejs-wheel-binaries`](https://pypi.org/project/nodejs-wheel-binaries/).
 
-The first call installs the superPDF reader (`@superpdf/cli`, about 185 MB with its PDF engine and OCR language
+The first call installs the superPDF reader (`@superpdf/cli`, about 220 MB with its PDF engine and OCR language
 data) from npm into your cache folder, once. To do that ahead of time, for example in a Docker image or before going offline:
 
 ```bash

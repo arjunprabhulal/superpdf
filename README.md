@@ -13,7 +13,7 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/arjunprabhulal/superpdf/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/arjunprabhulal/superpdf/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/@superpdf/cli?style=flat-square&color=4338ca)](https://www.npmjs.com/package/@superpdf/cli) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-555555?style=flat-square)](LICENSE) [![Node.js 22+](https://img.shields.io/badge/Node.js-22%2B-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org) [![MCP server](https://img.shields.io/badge/MCP-server-4338ca?style=flat-square)](#use-it-from-your-ai-assistant-mcp)
 
-**[Website](https://superpdf.ai) · [Docs](https://superpdf.ai/docs/mcp-api/command-line-tools) · [Benchmark](https://superpdf.ai/performance) · [Changelog](CHANGELOG.md)**
+**[Website](https://superpdf.ai) · [Docs](https://superpdf.ai/docs/mcp-api/command-line-tools) · [Python docs](https://superpdf.ai/docs/python) · [Benchmark](https://superpdf.ai/performance) · [Changelog](CHANGELOG.md)**
 
 [How it compares](#how-it-compares) · [Quick start](#quick-start) · [Python](#use-it-from-python) · [MCP tools](#mcp-tools) · [How it works](#how-it-works)
 
@@ -119,8 +119,8 @@ from superpdf.langchain import SuperPDFLoader       # pip install "superpdf[lang
 docs = SuperPDFLoader("report.pdf").load()
 ```
 
-Node.js comes with the package. All 30 tools, a LlamaIndex reader and the full reference are in
-[python/README.md](python/README.md).
+Node.js comes with the package. All 30 tools, a LlamaIndex reader and the full reference are in the
+[Python docs](https://superpdf.ai/docs/python) and [python/README.md](python/README.md).
 
 ### Use it from your own code (REST API)
 
