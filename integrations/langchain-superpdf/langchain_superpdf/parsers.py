@@ -26,19 +26,17 @@ _TABLES = ("markdown", "html")
 class SuperPDFParser(BaseBlobParser):
     """Parse PDF blobs into Markdown Documents with superPDF AI, on your computer.
 
-    Use it with ``GenericLoader`` or any blob loader; ``SuperPDFLoader`` uses it
-    for local files.
+    Use it for PDFs that arrive as bytes, or with any blob loader;
+    ``SuperPDFLoader`` uses it for local files.
 
     Example:
         .. code-block:: python
 
-            from langchain_community.document_loaders.generic import GenericLoader
+            from langchain_core.documents.base import Blob
             from langchain_superpdf import SuperPDFParser
 
-            loader = GenericLoader.from_filesystem(
-                "papers", glob="**/*.pdf", parser=SuperPDFParser()
-            )
-            docs = loader.load()
+            blob = Blob.from_data(pdf_bytes, path="upload.pdf")
+            docs = list(SuperPDFParser().lazy_parse(blob))
     """
 
     def __init__(

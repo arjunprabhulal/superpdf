@@ -135,7 +135,16 @@ text = superpdf.read_text("report.pdf", pages="1-2")  # the text layer, page by 
 `superpdf.tools()` lists every tool with its JSON input schema, and `superpdf.run_tool(name, arguments, allow=[...])`
 runs any of them by name, for tools added to the CLI before this package catches up.
 
-### LangChain
+### LangChain and LlamaIndex
+
+For new projects, install the integration packages, whose metadata matches each framework's other PDF loaders:
+[`langchain-superpdf`](https://pypi.org/project/langchain-superpdf/) and
+[`llama-index-readers-superpdf`](https://pypi.org/project/llama-index-readers-superpdf/). Guide:
+[superpdf.ai/docs/python/langchain-llamaindex](https://superpdf.ai/docs/python/langchain-llamaindex).
+
+The extras below keep working, with simpler metadata (`page` counted from 1).
+
+#### LangChain extra
 
 ```python
 from superpdf.langchain import SuperPDFLoader
@@ -144,7 +153,7 @@ docs = SuperPDFLoader("report.pdf").load()  # one Document per page
 docs[0].metadata  # {"source": "report.pdf", "page": 1}
 ```
 
-### LlamaIndex
+#### LlamaIndex extra
 
 ```python
 from superpdf.llama_index import SuperPDFReader

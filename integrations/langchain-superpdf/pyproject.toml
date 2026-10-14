@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "langchain-superpdf"
-version = "0.1.0"
+version = "0.1.1"
 description = "LangChain document loader for superPDF AI: local PDFs as Markdown with tables, charts as data and OCR."
 readme = "README.md"
 license = "Apache-2.0"
