@@ -13,8 +13,7 @@ import pytest
 import superpdf
 from superpdf import _cli
 
-ROOT = Path(__file__).resolve().parents[2]
-EXAMPLE = ROOT / "examples" / "quarterly-report.pdf"
+EXAMPLE = Path(__file__).resolve().parents[2] / "examples" / "quarterly-report.pdf"
 TWO_PAGES = "# One\n\nFirst page.\n\n<!-- end of page 1 -->\n\nSecond page.\n\n<!-- end of page 2 -->\n"
 
 
@@ -258,18 +257,6 @@ def test_llama_index_reader(fake: Recorder) -> None:
         {"file_path": "a.pdf", "page": 1, "team": "finance"},
         {"file_path": "a.pdf", "page": 2, "team": "finance"},
     ]
-
-
-# The real CLI: the repository's own bin/superpdf.js, or an installed superpdf.
-
-
-@pytest.fixture
-def real_cli(monkeypatch: pytest.MonkeyPatch) -> None:
-    # A source checkout with its dependencies installed tests that code; otherwise the pinned npm release is
-    # installed with the bundled Node.js, exactly as for users.
-    local = ROOT / "bin" / "superpdf.js"
-    if not os.environ.get("SUPERPDF_BIN") and local.exists() and (ROOT / "node_modules").exists():
-        monkeypatch.setenv("SUPERPDF_BIN", str(local))
 
 
 @pytest.mark.integration

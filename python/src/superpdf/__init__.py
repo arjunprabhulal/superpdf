@@ -12,9 +12,76 @@ import re
 from typing import Any
 
 from ._cli import CLI_VERSION, SuperPDFError, install_cli, run
+from ._tools import (
+    BatchResult,
+    Folder,
+    PdfInfo,
+    PipelineStep,
+    RepairResult,
+    SplitResult,
+    Structure,
+    Text,
+    Written,
+    add_page_labels,
+    add_watermark,
+    extract_pages,
+    extract_structure,
+    from_office,
+    info,
+    list_files,
+    merge,
+    protect,
+    read_text,
+    remove_metadata,
+    remove_pages,
+    repair,
+    rotate_pages,
+    run_batch,
+    run_pipeline,
+    run_tool,
+    split,
+    tools,
+    unlock,
+)
 
-__all__ = ["CLI_VERSION", "SuperPDFError", "export", "export_json", "export_pages", "install_cli"]
-__version__ = "0.1.0"
+__all__ = [
+    "CLI_VERSION",
+    "BatchResult",
+    "Folder",
+    "PdfInfo",
+    "PipelineStep",
+    "RepairResult",
+    "SplitResult",
+    "Structure",
+    "SuperPDFError",
+    "Text",
+    "Written",
+    "add_page_labels",
+    "add_watermark",
+    "export",
+    "export_json",
+    "export_pages",
+    "extract_pages",
+    "extract_structure",
+    "from_office",
+    "info",
+    "install_cli",
+    "list_files",
+    "merge",
+    "protect",
+    "read_text",
+    "remove_metadata",
+    "remove_pages",
+    "repair",
+    "rotate_pages",
+    "run_batch",
+    "run_pipeline",
+    "run_tool",
+    "split",
+    "tools",
+    "unlock",
+]
+__version__ = "0.2.0"
 
 _PAGE_END = re.compile(r"^<!-- end of page (\d+) -->\s*$", re.MULTILINE)
 

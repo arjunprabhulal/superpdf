@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0
+
+- Every superPDF tool as a typed Python function: `info`, `list_files`, `read_text`, `extract_structure`, `merge`,
+  `extract_pages`, `remove_pages`, `rotate_pages`, `split`, `add_page_labels`, `add_watermark`, `remove_metadata`,
+  `repair`, `protect`, `unlock`, `from_office`, `run_pipeline` and `run_batch`, with typed results.
+- `tools()` lists every tool with its JSON input schema; `run_tool(name, arguments, allow=...)` runs any by name.
+- Uses `@superpdf/cli` 0.2.0. A test keeps each function's parameters and allowed values in step with the CLI's
+  schemas.
+
 ## 0.1.0
 
 First release.

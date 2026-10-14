@@ -111,11 +111,15 @@ import superpdf
 markdown = superpdf.export("report.pdf")
 pages = superpdf.export_pages("report.pdf")        # Markdown per page
 
+superpdf.merge(["a.pdf", "b.pdf"], "combined.pdf")  # every tool is a typed function
+superpdf.protect("payslip.pdf", "a long password", "locked.pdf")
+
 from superpdf.langchain import SuperPDFLoader       # pip install "superpdf[langchain]"
 docs = SuperPDFLoader("report.pdf").load()
 ```
 
-Node.js comes with the package. A LlamaIndex reader is included too; see [python/README.md](python/README.md).
+Node.js comes with the package. All 18 tools, a LlamaIndex reader and the full reference are in
+[python/README.md](python/README.md).
 
 ### Use it from your own code (REST API)
 
@@ -152,6 +156,8 @@ superpdf export document.pdf --tables html --output doc.md    # tables as HTML, 
 superpdf convert report.docx --output report.pdf              # Word, Excel, PowerPoint; needs LibreOffice
 superpdf pipeline document.pdf --steps steps.json --output result.pdf
 superpdf audio document.pdf --output document.m4a             # read aloud with the macOS system voice
+superpdf tools                                                # all 18 tools with their JSON input schemas
+superpdf tool pdf_protect --input '{"input":"a.pdf","password":"…","output":"locked.pdf"}'   # any tool, JSON in and out
 ```
 
 Results are always written to a new file; existing files are never overwritten. `superpdf help` shows every command.

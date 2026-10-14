@@ -14,7 +14,7 @@ import tempfile
 from pathlib import Path
 
 # The @superpdf/cli version this package is tested with.
-CLI_VERSION = "0.1.3"
+CLI_VERSION = "0.2.0"
 NODE_MAJOR = 22
 
 
@@ -141,11 +141,17 @@ def command() -> list[str]:
     return [_node()[0], str(script)]
 
 
-def run(args: list[str], timeout: float | None = 600) -> str:
-    """Run superPDF with `args` and return what it printed. Raises SuperPDFError on failure."""
+def run(args: list[str], timeout: float | None = 600, stdin: str | None = None) -> str:
+    """Run superPDF with `args` (and `stdin`, if given) and return what it printed. Raises SuperPDFError on failure."""
     try:
         result = subprocess.run(
-            [*command(), *args], capture_output=True, timeout=timeout, check=False, encoding="utf-8", errors="replace"
+            [*command(), *args],
+            input=stdin,
+            capture_output=True,
+            timeout=timeout,
+            check=False,
+            encoding="utf-8",
+            errors="replace",
         )
     except subprocess.TimeoutExpired as error:
         raise SuperPDFError(f"superPDF didn't finish within {timeout:.0f} seconds.") from error

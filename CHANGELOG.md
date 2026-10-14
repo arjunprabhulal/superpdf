@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0
+
+- `superpdf tools` lists all 18 tools with their JSON input schemas; `superpdf tool <name> --input '<json>'` runs
+  any of them (JSON on stdin with `--input -`) and prints the result as JSON. Same validation, folder scope and
+  results as the MCP server and the local API. Used by the Python package.
+- A wrong value now names the allowed ones, such as "angle: use 90, 180 or 270".
+
 ## 0.1.3
 
 - Windows: exports work. PDF.js data folders were built with `\`, which PDF.js rejects ("Invalid factory url"); they now use `/`. macOS and Linux are unchanged.
