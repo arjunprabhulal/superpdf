@@ -1,0 +1,11 @@
+name: Idea
+description: Suggest a command, an MCP tool or an improvement
+labels: [idea]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to do?
+      description: The task you're trying to get done, and how superPDF could help.
+    validations:
+      required: true

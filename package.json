@@ -21,9 +21,8 @@
     "LICENSE",
     "NOTICE"
   ],
-  "homepage": "https://superpdf.ai/docs/mcp-api/command-line-tools",
-  "publishConfig": {
-    "access": "public"
+  "scripts": {
+    "test": "node --test tests/*.test.js"
   },
   "engines": {
     "node": ">=22"
@@ -37,15 +36,19 @@
     "tesseract.js": "7.0.0",
     "zod": "4.6.6"
   },
-  "devDependencies": {
-    "@tesseract.js-data/eng": "1.0.0",
-    "zod-openapi": "6.0.2"
-  },
+  "homepage": "https://superpdf.ai/docs/mcp-api/command-line-tools",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/arjunprabhulal/superpdf.git"
   },
   "bugs": {
     "url": "https://github.com/arjunprabhulal/superpdf/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@tesseract.js-data/eng": "1.0.0",
+    "zod-openapi": "6.0.2"
   }
 }

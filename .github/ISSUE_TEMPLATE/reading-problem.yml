@@ -1,0 +1,28 @@
+name: Reading problem
+description: A PDF that comes out wrong (missing text, a broken table, wrong reading order, a chart not read)
+labels: [reader]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What came out wrong
+      description: What you expected and what superPDF wrote instead. Paste the relevant part of the output.
+    validations:
+      required: true
+  - type: textarea
+    id: file
+    attributes:
+      label: The PDF
+      description: Attach the PDF or one page of it. Only share files you are allowed to share publicly.
+    validations:
+      required: true
+  - type: input
+    id: command
+    attributes:
+      label: Command
+      placeholder: superpdf export report.pdf --output report.md
+  - type: input
+    id: version
+    attributes:
+      label: Versions
+      description: Output of `superpdf --version` and `node --version`, and your operating system.
