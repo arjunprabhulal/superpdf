@@ -62,6 +62,30 @@ for doc in docs:
         chunks.append(chunk)
 ```
 
+## Agents (LangGraph)
+
+For agents, use superPDF AI's MCP server: its 30 PDF tools (read, tables to Excel, Word export, merge, fill forms,
+compare and more) load as LangChain tools through
+[langchain-mcp-adapters](https://github.com/langchain-ai/langchain-mcp-adapters) and run in any LangGraph agent. The
+tools can only use the folders you pass with `--allow-dir`.
+
+```python
+from langchain.agents import create_agent
+from langchain_mcp_adapters.client import MultiServerMCPClient
+
+client = MultiServerMCPClient(
+    {
+        "superpdf": {
+            "command": "npx",
+            "args": ["-y", "@superpdf/cli", "mcp", "--allow-dir", "/Users/you/Documents/superPDF"],
+            "transport": "stdio",
+        }
+    }
+)
+tools = await client.get_tools()
+agent = create_agent("anthropic:claude-sonnet-5-5", tools)
+```
+
 More, including search with page citations: [superpdf.ai/docs/python/langchain-llamaindex](https://superpdf.ai/docs/python/langchain-llamaindex).
 
 ## License

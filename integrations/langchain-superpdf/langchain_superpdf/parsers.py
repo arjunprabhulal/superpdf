@@ -13,7 +13,7 @@ from langchain_core.document_loaders import BaseBlobParser
 from langchain_core.documents import Document
 from langchain_core.documents.base import Blob
 
-DEFAULT_PAGES_DELIMITER = "\n-----\n\n"
+DEFAULT_PAGES_DELIMITER = "\n\f"  # the same as LangChain's own PDF parsers
 
 
 class SuperPDFParser(BaseBlobParser):

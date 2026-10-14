@@ -74,3 +74,10 @@ def test_parser_reads_in_memory_blobs_through_a_temporary_file(fake: FakeSuperPD
     assert len(docs) == 2 and docs[0].metadata["source"] == "upload.pdf"
     temporary = fake.calls[0][1]
     assert temporary.endswith(".pdf") and not Path(temporary).exists()  # cleaned up
+
+
+def test_single_mode_defaults_to_langchains_page_delimiter(fake: FakeSuperPDF, tmp_path: Path) -> None:
+    pdf = tmp_path / "report.pdf"
+    pdf.write_bytes(b"%PDF-1.7")
+    [doc] = SuperPDFLoader(pdf, mode="single").load()
+    assert doc.page_content == "# Quarterly report\n\f## Revenue"
