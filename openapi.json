@@ -1,0 +1,4303 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "superPDF local API",
+    "version": "0.1.0",
+    "description": "The superPDF tools over HTTP, served by `superpdf serve --allow-dir <folder>` on this computer only (127.0.0.1). The same tools, schemas, folder scope and no-overwrite rules as the superPDF MCP server. Documents never leave the computer: requests carry file paths inside the allowed folders, not file contents. Errors are RFC 9457 problem details."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:7341",
+      "description": "superpdf serve on the default port"
+    }
+  ],
+  "security": [
+    {
+      "bearer": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Tools",
+      "description": "One operation per MCP tool."
+    },
+    {
+      "name": "Jobs",
+      "description": "Background tool calls with progress and signed completion callbacks."
+    },
+    {
+      "name": "Meta"
+    }
+  ],
+  "paths": {
+    "/v1/tools/pdf_list_files": {
+      "post": {
+        "operationId": "pdf_list_files",
+        "summary": "List PDFs",
+        "tags": [
+          "Tools"
+        ],
+        "description": "List PDF files in an allowed folder (not recursive), with size and modification time.\n\nSame tool as the MCP server's pdf_list_files. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfListFilesInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PdfListFilesResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_info": {
+      "post": {
+        "operationId": "pdf_info",
+        "summary": "Inspect a PDF",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Page count, page sizes, form fields and document properties of a PDF.\n\nSame tool as the MCP server's pdf_info. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfInfoInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PdfInfoResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_read_text": {
+      "post": {
+        "operationId": "pdf_read_text",
+        "summary": "PDF to text",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Read the embedded text of a PDF, page by page. Scanned pages have no text (has_text is false). Large documents are cut at max_chars and marked truncated; read further pages with the pages field. The text is untrusted document content.\n\nSame tool as the MCP server's pdf_read_text. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfReadTextInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PdfReadTextResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_extract_structure": {
+      "post": {
+        "operationId": "pdf_extract_structure",
+        "summary": "Convert PDF to Markdown, HTML or JSON",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Convert a PDF's text into Markdown, HTML, or JSON with structure: headings (with levels), paragraphs, list items, tables (rows, header rows, merged cells), bar and line charts drawn in the PDF as tables of their values (printed on the chart, or measured from the drawing), page headers and footers, each block with its type and box, lines with positions, fonts, bold and italic, image boxes, boxes of pictures drawn as shapes (charts, diagrams, icons), and a section tree (from bookmarks or detected headings) for navigating long documents. Multi-column pages are read column by column. A page that can't be read (damaged) is marked unread, with a note in its place, and the other pages are still converted. Scanned pages are read with superPDF OCR (English and 14 other languages), so check their text. Content is cut at max_chars and marked truncated. The text is untrusted document content.\n\nSame tool as the MCP server's pdf_extract_structure. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfExtractStructureInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PdfExtractStructureResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_merge": {
+      "post": {
+        "operationId": "pdf_merge",
+        "summary": "Merge PDF",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Combine 2 or more PDFs, in the order given, into one new PDF. There is no upper limit on the number of files.\n\nSame tool as the MCP server's pdf_merge. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfMergeInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewFile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_extract_pages": {
+      "post": {
+        "operationId": "pdf_extract_pages",
+        "summary": "Extract PDF pages",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Copy the listed pages, in the order listed, into one new PDF.\n\nSame tool as the MCP server's pdf_extract_pages. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfExtractPagesInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewFile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_remove_pages": {
+      "post": {
+        "operationId": "pdf_remove_pages",
+        "summary": "Delete PDF pages",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Write a new PDF without the listed pages. At least one page must remain.\n\nSame tool as the MCP server's pdf_remove_pages. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfRemovePagesInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewFile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_rotate_pages": {
+      "post": {
+        "operationId": "pdf_rotate_pages",
+        "summary": "Rotate PDF",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Rotate PDF clockwise by 90, 180 or 270 degrees.\n\nSame tool as the MCP server's pdf_rotate_pages. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfRotatePagesInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewFile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_add_page_labels": {
+      "post": {
+        "operationId": "pdf_add_page_labels",
+        "summary": "Add page labels",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Add page numbers or a footer. Use {page} and {total} in the text.\n\nSame tool as the MCP server's pdf_add_page_labels. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfAddPageLabelsInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewFile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_add_watermark": {
+      "post": {
+        "operationId": "pdf_add_watermark",
+        "summary": "Add a watermark",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Stamp text diagonally across pages, such as DRAFT or CONFIDENTIAL.\n\nSame tool as the MCP server's pdf_add_watermark. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfAddWatermarkInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewFile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_split": {
+      "post": {
+        "operationId": "pdf_split",
+        "summary": "Split a PDF",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Split one PDF into several new files: one per comma-separated range (mode \"ranges\"), or one per page (mode \"pages\"). Files are written to output_folder.\n\nSame tool as the MCP server's pdf_split. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfSplitInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PdfSplitResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_from_office": {
+      "post": {
+        "operationId": "pdf_from_office",
+        "summary": "Convert an Office file to PDF",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Convert a Word, Excel, PowerPoint or OpenDocument file (.docx, .xlsx, .pptx, .odt, .ods, .odp) to a new PDF with LibreOffice installed on this computer. Fails with an install hint when LibreOffice isn't installed.\n\nSame tool as the MCP server's pdf_from_office. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfFromOfficeInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PdfFromOfficeResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_remove_metadata": {
+      "post": {
+        "operationId": "pdf_remove_metadata",
+        "summary": "Remove document properties",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Write a copy without author, title, subject, keywords, creator and producer properties.\n\nSame tool as the MCP server's pdf_remove_metadata. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfRemoveMetadataInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewFile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_repair": {
+      "post": {
+        "operationId": "pdf_repair",
+        "summary": "Repair a PDF",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Rewrite a damaged PDF and rebuild its cross-reference table. Reports what was fixed.\n\nSame tool as the MCP server's pdf_repair. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfRepairInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PdfRepairResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_protect": {
+      "post": {
+        "operationId": "pdf_protect",
+        "summary": "Password-protect a PDF",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Encrypt a copy with AES-256 so it needs a password to open. Only use a password the user gave you for this purpose.\n\nSame tool as the MCP server's pdf_protect. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfProtectInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewFile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_unlock": {
+      "post": {
+        "operationId": "pdf_unlock",
+        "summary": "Remove a PDF password",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Write a decrypted copy using a password the user knows. Never guesses passwords.\n\nSame tool as the MCP server's pdf_unlock. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfUnlockInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewFile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_run_pipeline": {
+      "post": {
+        "operationId": "pdf_run_pipeline",
+        "summary": "Run a pipeline",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Apply 1–10 steps in order and write one new PDF. Step actions: extract, remove, rotate, crop, scale, flatten, labels, watermark, metadata-clear; options as in the matching tools (e.g. {\"action\":\"rotate\",\"options\":{\"pages\":\"1\",\"angle\":90}}).\n\nSame tool as the MCP server's pdf_run_pipeline. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfRunPipelineInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewFile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools/pdf_run_batch": {
+      "post": {
+        "operationId": "pdf_run_batch",
+        "summary": "Run a batch",
+        "tags": [
+          "Tools"
+        ],
+        "description": "Apply the same 1–10 pipeline steps to each of 1–50 PDFs, one file at a time. Each result is written to output_folder as <name>-<suffix>.pdf. A file that fails is skipped and listed in failed with the reason; the rest continue.\n\nSame tool as the MCP server's pdf_run_batch. Runs before responding; for long work, POST /v1/jobs instead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfRunBatchInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result. Any new files are written inside the allowed folders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PdfRunBatchResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output file already exists. superPDF never overwrites; choose a new name.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input (errors names each field), a path outside the allowed folders, or a document the tool could not process.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many tool calls are running and waiting (4 at once, 2 of them LibreOffice conversions; 64 more wait their turn).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server failure.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tools": {
+      "get": {
+        "operationId": "list_tools",
+        "summary": "List tools",
+        "tags": [
+          "Tools"
+        ],
+        "responses": {
+          "200": {
+            "description": "Every tool, with its MCP annotations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tools": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "reports_progress": {
+                            "type": "boolean"
+                          },
+                          "annotations": {
+                            "type": "object",
+                            "propertyNames": {
+                              "type": "string"
+                            },
+                            "additionalProperties": {
+                              "type": "boolean"
+                            }
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "title",
+                          "description",
+                          "reports_progress",
+                          "annotations"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "tools"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/jobs": {
+      "post": {
+        "operationId": "create_job",
+        "summary": "Run a tool in the background",
+        "tags": [
+          "Jobs"
+        ],
+        "description": "Queues a tool call and returns at once with the job. Jobs run one at a time. Poll GET /v1/jobs/{id}, or pass callback_url to receive a signed event when it finishes. Failed callback deliveries are retried up to 5 times with exponential backoff (1, 2, 4 and 8 seconds).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Queued.",
+            "headers": {
+              "Location": {
+                "description": "The job URL.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body is not application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input, or a callback_url that is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many jobs are waiting.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "callbacks": {
+          "jobFinished": {
+            "{$request.body#/callback_url}": {
+              "post": {
+                "summary": "Job finished",
+                "description": "Headers: webhook-id (the same on every retry), webhook-timestamp (Unix seconds) and webhook-signature: \"v1,\" + base64 HMAC-SHA256 of \"<webhook-id>.<webhook-timestamp>.<raw body>\". The key is the base64-decoded part of the whsec_ secret printed at start (or SUPERPDF_WEBHOOK_SECRET). Reject events whose timestamp is more than 5 minutes off.",
+                "requestBody": {
+                  "required": true,
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/WebhookEvent"
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "2XX": {
+                    "description": "Received. Any other status, or no answer within 10 seconds, is retried for 408, 429, 5xx and network errors."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "list_jobs",
+        "summary": "List jobs",
+        "tags": [
+          "Jobs"
+        ],
+        "responses": {
+          "200": {
+            "description": "Jobs from this server process, newest first. Finished jobs are kept for an hour.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jobs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Job"
+                      }
+                    }
+                  },
+                  "required": [
+                    "jobs"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/jobs/{id}": {
+      "get": {
+        "operationId": "get_job",
+        "summary": "Get a job",
+        "tags": [
+          "Jobs"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string",
+              "description": "The job id from POST /v1/jobs."
+            },
+            "required": true,
+            "description": "The job id from POST /v1/jobs."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The job, with its result once it has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The bearer token is missing or wrong.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such job.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "operationId": "get_openapi",
+        "summary": "This document",
+        "tags": [
+          "Meta"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "The OpenAPI 3.1 document. No token needed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Host or Origin header is not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Job": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tool": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "running",
+              "succeeded",
+              "failed"
+            ]
+          },
+          "progress": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "progress": {
+                    "type": "number"
+                  },
+                  "total": {
+                    "type": "number"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "progress",
+                  "total"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest progress from tools that report it (merge, split, pipelines, batches)."
+          },
+          "created_at": {
+            "type": "string",
+            "description": "ISO 8601 time."
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "ISO 8601 time."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "ISO 8601 time."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "result": {
+            "description": "Once succeeded: the same result POST /v1/tools/{tool} returns."
+          },
+          "error": {
+            "description": "Once failed: why.",
+            "$ref": "#/components/schemas/Problem"
+          },
+          "callback": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "delivering",
+                  "delivered",
+                  "failed"
+                ]
+              },
+              "attempts": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "last_status": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "HTTP status of the last attempt; null when the receiver could not be reached."
+              }
+            },
+            "required": [
+              "url",
+              "status",
+              "attempts",
+              "last_status"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "tool",
+          "status",
+          "progress",
+          "created_at",
+          "started_at",
+          "finished_at"
+        ],
+        "additionalProperties": false
+      },
+      "JobRequest": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_list_files"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfListFilesInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_info"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfInfoInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_read_text"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfReadTextInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_extract_structure"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfExtractStructureInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_merge"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfMergeInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_extract_pages"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfExtractPagesInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_remove_pages"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfRemovePagesInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_rotate_pages"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfRotatePagesInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_add_page_labels"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfAddPageLabelsInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_add_watermark"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfAddWatermarkInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_split"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfSplitInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_from_office"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfFromOfficeInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_remove_metadata"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfRemoveMetadataInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_repair"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfRepairInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_protect"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfProtectInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_unlock"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfUnlockInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_run_pipeline"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfRunPipelineInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "const": "pdf_run_batch"
+              },
+              "input": {
+                "$ref": "#/components/schemas/PdfRunBatchInput"
+              },
+              "callback_url": {
+                "type": "string",
+                "maxLength": 2048,
+                "description": "Where to POST a signed event when the job finishes. Loopback addresses (127.0.0.1, localhost, [::1]) are allowed by default; other origins only when the API was started with --webhook-allow <origin>."
+              }
+            },
+            "required": [
+              "tool",
+              "input"
+            ]
+          }
+        ],
+        "description": "A tool call to run in the background.",
+        "type": "object"
+      },
+      "NewFile": {
+        "type": "object",
+        "properties": {
+          "output": {
+            "type": "string"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "output",
+          "pages",
+          "bytes"
+        ],
+        "additionalProperties": false
+      },
+      "PdfAddPageLabelsInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to a PDF inside an allowed folder (absolute, or relative to the first allowed folder)."
+          },
+          "pages": {
+            "description": "Page numbers or ranges, such as \"1, 3-5\". Omit for every page.",
+            "type": "string",
+            "maxLength": 200
+          },
+          "text": {
+            "default": "{page} / {total}",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path for the new PDF, inside an allowed folder. Must not exist yet; superPDF never overwrites files."
+          }
+        },
+        "required": [
+          "input",
+          "output"
+        ]
+      },
+      "PdfAddWatermarkInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to a PDF inside an allowed folder (absolute, or relative to the first allowed folder)."
+          },
+          "pages": {
+            "description": "Page numbers or ranges, such as \"1, 3-5\". Omit for every page.",
+            "type": "string",
+            "maxLength": 200
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path for the new PDF, inside an allowed folder. Must not exist yet; superPDF never overwrites files."
+          }
+        },
+        "required": [
+          "input",
+          "text",
+          "output"
+        ]
+      },
+      "PdfExtractPagesInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to a PDF inside an allowed folder (absolute, or relative to the first allowed folder)."
+          },
+          "pages": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Page numbers or ranges, such as \"1, 3-5\"."
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path for the new PDF, inside an allowed folder. Must not exist yet; superPDF never overwrites files."
+          }
+        },
+        "required": [
+          "input",
+          "pages",
+          "output"
+        ]
+      },
+      "PdfExtractStructureInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to a PDF inside an allowed folder (absolute, or relative to the first allowed folder)."
+          },
+          "pages": {
+            "description": "Page numbers or ranges, such as \"1, 3-5\". Omit for every page.",
+            "type": "string",
+            "maxLength": 200
+          },
+          "format": {
+            "default": "markdown",
+            "type": "string",
+            "enum": [
+              "markdown",
+              "html",
+              "json"
+            ]
+          },
+          "max_chars": {
+            "default": 60000,
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 400000
+          }
+        },
+        "required": [
+          "input"
+        ]
+      },
+      "PdfExtractStructureResult": {
+        "type": "object",
+        "properties": {
+          "format": {
+            "type": "string"
+          },
+          "total_pages": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "has_text": {
+            "type": "boolean"
+          },
+          "truncated": {
+            "type": "boolean"
+          },
+          "content": {
+            "type": "string"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            }
+          }
+        },
+        "required": [
+          "format",
+          "total_pages",
+          "has_text",
+          "truncated",
+          "content",
+          "sections"
+        ],
+        "additionalProperties": false
+      },
+      "PdfFromOfficeInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to the Office file inside an allowed folder (absolute, or relative to the first allowed folder)."
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path for the new PDF, inside an allowed folder. Must not exist yet; superPDF never overwrites files."
+          }
+        },
+        "required": [
+          "input",
+          "output"
+        ]
+      },
+      "PdfFromOfficeResult": {
+        "type": "object",
+        "properties": {
+          "output": {
+            "type": "string"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "engine": {
+            "type": "string",
+            "const": "LibreOffice"
+          }
+        },
+        "required": [
+          "output",
+          "pages",
+          "bytes",
+          "engine"
+        ],
+        "additionalProperties": false
+      },
+      "PdfInfoInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to a PDF inside an allowed folder (absolute, or relative to the first allowed folder)."
+          }
+        },
+        "required": [
+          "input"
+        ]
+      },
+      "PdfInfoResult": {
+        "type": "object",
+        "propertyNames": {
+          "type": "string"
+        },
+        "additionalProperties": {}
+      },
+      "PdfListFilesInput": {
+        "type": "object",
+        "properties": {
+          "folder": {
+            "description": "Folder inside an allowed folder. Omit for the first allowed folder.",
+            "type": "string"
+          }
+        }
+      },
+      "PdfListFilesResult": {
+        "type": "object",
+        "properties": {
+          "folder": {
+            "type": "string"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "bytes": {
+                  "type": "number"
+                },
+                "modified": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "bytes",
+                "modified"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "folder",
+          "files"
+        ],
+        "additionalProperties": false
+      },
+      "PdfMergeInput": {
+        "type": "object",
+        "properties": {
+          "inputs": {
+            "minItems": 2,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "PDF paths in the order to combine."
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path for the new PDF, inside an allowed folder. Must not exist yet; superPDF never overwrites files."
+          }
+        },
+        "required": [
+          "inputs",
+          "output"
+        ]
+      },
+      "PdfProtectInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to a PDF inside an allowed folder (absolute, or relative to the first allowed folder)."
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 127
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path for the new PDF, inside an allowed folder. Must not exist yet; superPDF never overwrites files."
+          }
+        },
+        "required": [
+          "input",
+          "password",
+          "output"
+        ]
+      },
+      "PdfReadTextInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to a PDF inside an allowed folder (absolute, or relative to the first allowed folder)."
+          },
+          "pages": {
+            "description": "Page numbers or ranges, such as \"1, 3-5\". Omit for every page.",
+            "type": "string",
+            "maxLength": 200
+          },
+          "max_chars": {
+            "default": 20000,
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 200000
+          }
+        },
+        "required": [
+          "input"
+        ]
+      },
+      "PdfReadTextResult": {
+        "type": "object",
+        "properties": {
+          "total_pages": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "has_text": {
+            "type": "boolean"
+          },
+          "truncated": {
+            "type": "boolean"
+          },
+          "pages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "page": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "text": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "page",
+                "text"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "total_pages",
+          "has_text",
+          "truncated",
+          "pages"
+        ],
+        "additionalProperties": false
+      },
+      "PdfRemoveMetadataInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to a PDF inside an allowed folder (absolute, or relative to the first allowed folder)."
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path for the new PDF, inside an allowed folder. Must not exist yet; superPDF never overwrites files."
+          }
+        },
+        "required": [
+          "input",
+          "output"
+        ]
+      },
+      "PdfRemovePagesInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to a PDF inside an allowed folder (absolute, or relative to the first allowed folder)."
+          },
+          "pages": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Page numbers or ranges, such as \"1, 3-5\"."
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path for the new PDF, inside an allowed folder. Must not exist yet; superPDF never overwrites files."
+          }
+        },
+        "required": [
+          "input",
+          "pages",
+          "output"
+        ]
+      },
+      "PdfRepairInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to a PDF inside an allowed folder (absolute, or relative to the first allowed folder)."
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path for the new PDF, inside an allowed folder. Must not exist yet; superPDF never overwrites files."
+          }
+        },
+        "required": [
+          "input",
+          "output"
+        ]
+      },
+      "PdfRepairResult": {
+        "type": "object",
+        "properties": {
+          "output": {
+            "type": "string"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "fixed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "output",
+          "pages",
+          "bytes",
+          "fixed"
+        ],
+        "additionalProperties": false
+      },
+      "PdfRotatePagesInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to a PDF inside an allowed folder (absolute, or relative to the first allowed folder)."
+          },
+          "pages": {
+            "description": "Page numbers or ranges, such as \"1, 3-5\". Omit for every page.",
+            "type": "string",
+            "maxLength": 200
+          },
+          "angle": {
+            "default": 90,
+            "description": "Clockwise rotation in degrees.",
+            "anyOf": [
+              {
+                "type": "number",
+                "const": 90
+              },
+              {
+                "type": "number",
+                "const": 180
+              },
+              {
+                "type": "number",
+                "const": 270
+              }
+            ]
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path for the new PDF, inside an allowed folder. Must not exist yet; superPDF never overwrites files."
+          }
+        },
+        "required": [
+          "input",
+          "output"
+        ]
+      },
+      "PdfRunBatchInput": {
+        "type": "object",
+        "properties": {
+          "inputs": {
+            "minItems": 1,
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "PDF paths to process."
+          },
+          "steps": {
+            "minItems": 1,
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PipelineStep"
+            },
+            "description": "Steps run in order, such as [{\"action\":\"rotate\",\"options\":{\"pages\":\"1\",\"angle\":90}}]."
+          },
+          "output_folder": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Folder for the new files, inside an allowed folder; created if missing."
+          },
+          "suffix": {
+            "default": "processed",
+            "description": "Added to each output file name.",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,40}$"
+          }
+        },
+        "required": [
+          "inputs",
+          "steps",
+          "output_folder"
+        ]
+      },
+      "PdfRunBatchResult": {
+        "type": "object",
+        "properties": {
+          "outputs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "output": {
+                  "type": "string"
+                },
+                "pages": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "bytes": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "input": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "output",
+                "pages",
+                "bytes",
+                "input"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "failed": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "input": {
+                  "type": "string"
+                },
+                "error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "input",
+                "error"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "outputs",
+          "failed"
+        ],
+        "additionalProperties": false
+      },
+      "PdfRunPipelineInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to a PDF inside an allowed folder (absolute, or relative to the first allowed folder)."
+          },
+          "steps": {
+            "minItems": 1,
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PipelineStep"
+            },
+            "description": "Steps run in order, such as [{\"action\":\"rotate\",\"options\":{\"pages\":\"1\",\"angle\":90}}]."
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path for the new PDF, inside an allowed folder. Must not exist yet; superPDF never overwrites files."
+          }
+        },
+        "required": [
+          "input",
+          "steps",
+          "output"
+        ]
+      },
+      "PdfSplitInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to a PDF inside an allowed folder (absolute, or relative to the first allowed folder)."
+          },
+          "pages": {
+            "description": "Page numbers or ranges, such as \"1, 3-5\". Omit for every page.",
+            "type": "string",
+            "maxLength": 200
+          },
+          "mode": {
+            "default": "ranges",
+            "type": "string",
+            "enum": [
+              "ranges",
+              "pages"
+            ]
+          },
+          "output_folder": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Folder for the new files, inside an allowed folder; created if missing."
+          }
+        },
+        "required": [
+          "input",
+          "output_folder"
+        ]
+      },
+      "PdfSplitResult": {
+        "type": "object",
+        "properties": {
+          "outputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NewFile"
+            }
+          }
+        },
+        "required": [
+          "outputs"
+        ],
+        "additionalProperties": false
+      },
+      "PdfUnlockInput": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to a PDF inside an allowed folder (absolute, or relative to the first allowed folder)."
+          },
+          "password": {
+            "default": "",
+            "type": "string",
+            "maxLength": 127
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path for the new PDF, inside an allowed folder. Must not exist yet; superPDF never overwrites files."
+          }
+        },
+        "required": [
+          "input",
+          "output"
+        ]
+      },
+      "PipelineStep": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "action": {
+                "type": "string",
+                "const": "extract"
+              },
+              "options": {
+                "description": "Options as in the matching tool.",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "pages": {
+                    "description": "Page numbers or ranges, such as \"1, 3-5\". Omit for every page.",
+                    "type": "string",
+                    "maxLength": 200
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "action": {
+                "type": "string",
+                "const": "remove"
+              },
+              "options": {
+                "description": "Options as in the matching tool.",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "pages": {
+                    "description": "Page numbers or ranges, such as \"1, 3-5\". Omit for every page.",
+                    "type": "string",
+                    "maxLength": 200
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "action": {
+                "type": "string",
+                "const": "rotate"
+              },
+              "options": {
+                "description": "Options as in the matching tool.",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "pages": {
+                    "description": "Page numbers or ranges, such as \"1, 3-5\". Omit for every page.",
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "angle": {
+                    "default": 90,
+                    "description": "Clockwise rotation in degrees.",
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "const": 90
+                      },
+                      {
+                        "type": "number",
+                        "const": 180
+                      },
+                      {
+                        "type": "number",
+                        "const": 270
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "action": {
+                "type": "string",
+                "const": "crop"
+              },
+              "options": {
+                "description": "Options as in the matching tool.",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "pages": {
+                    "description": "Page numbers or ranges, such as \"1, 3-5\". Omit for every page.",
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "margin": {
+                    "default": 24,
+                    "description": "Points trimmed from each edge.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 500
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "action": {
+                "type": "string",
+                "const": "scale"
+              },
+              "options": {
+                "description": "Options as in the matching tool.",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "pages": {
+                    "description": "Page numbers or ranges, such as \"1, 3-5\". Omit for every page.",
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "factor": {
+                    "default": 1,
+                    "description": "Scale factor, 0.1–4.",
+                    "type": "number",
+                    "minimum": 0.1,
+                    "maximum": 4
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "action": {
+                "type": "string",
+                "const": "flatten"
+              },
+              "options": {
+                "description": "Options as in the matching tool.",
+                "default": {},
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "action": {
+                "type": "string",
+                "const": "labels"
+              },
+              "options": {
+                "description": "Options as in the matching tool.",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "pages": {
+                    "description": "Page numbers or ranges, such as \"1, 3-5\". Omit for every page.",
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "text": {
+                    "default": "{page} / {total}",
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "position": {
+                    "default": "bottom",
+                    "type": "string",
+                    "enum": [
+                      "top",
+                      "bottom"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "action": {
+                "type": "string",
+                "const": "watermark"
+              },
+              "options": {
+                "description": "Options as in the matching tool.",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "pages": {
+                    "description": "Page numbers or ranges, such as \"1, 3-5\". Omit for every page.",
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 60
+                  }
+                },
+                "required": [
+                  "text"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "action": {
+                "type": "string",
+                "const": "metadata-clear"
+              },
+              "options": {
+                "description": "Options as in the matching tool.",
+                "default": {},
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "action"
+            ]
+          }
+        ],
+        "type": "object"
+      },
+      "Problem": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Stable problem type URI: urn:superpdf:problem:<code>."
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 400,
+            "maximum": 599
+          },
+          "detail": {
+            "type": "string",
+            "description": "What went wrong and how to fix it."
+          },
+          "instance": {
+            "type": "string",
+            "description": "URN for this problem occurrence."
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "bad_request",
+              "unauthorized",
+              "forbidden",
+              "not_found",
+              "method_not_allowed",
+              "conflict",
+              "payload_too_large",
+              "unsupported_media_type",
+              "validation",
+              "operation_failed",
+              "too_many_jobs",
+              "busy",
+              "internal"
+            ]
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "errors": {
+            "description": "The fields to fix, for validation and conflict problems.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "field",
+                "message"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "instance",
+          "code",
+          "request_id"
+        ],
+        "additionalProperties": false,
+        "description": "RFC 9457 Problem Details."
+      },
+      "WebhookEvent": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "job.succeeded",
+              "job.failed"
+            ]
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "ISO 8601 time."
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "job_id": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "succeeded",
+                  "failed"
+                ]
+              },
+              "created_at": {
+                "type": "string",
+                "description": "ISO 8601 time."
+              },
+              "finished_at": {
+                "type": "string",
+                "description": "ISO 8601 time."
+              },
+              "outputs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Paths of the files the job wrote. Document contents are never included; fetch the job for its result."
+              },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "detail": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code",
+                  "detail"
+                ]
+              }
+            },
+            "required": [
+              "job_id",
+              "tool",
+              "status",
+              "created_at",
+              "finished_at",
+              "outputs"
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "timestamp",
+          "data"
+        ],
+        "description": "Sent as JSON with webhook-id, webhook-timestamp and webhook-signature headers (Standard Webhooks: v1, HMAC-SHA256 of \"<id>.<timestamp>.<body>\")."
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "The token superpdf serve prints when it starts (or SUPERPDF_API_TOKEN). It changes every launch."
+      }
+    }
+  }
+}

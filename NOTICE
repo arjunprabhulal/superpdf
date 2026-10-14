@@ -1,0 +1,28 @@
+superPDF AI command-line tool (@superpdf/cli)
+Copyright 2026 Arjun Prabhulal
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Approaches adapted from other open-source projects
+--------------------------------------------------
+The PDF reader re-implements ideas from these projects in its own code. Their licences are permissive; their
+copyright belongs to their authors.
+
+- pdfplumber (MIT), https://github.com/jsvine/pdfplumber
+  Adapted: joining table lines that come within a small tolerance of each other into one grid (lib/pdf-layout.js, lineGroups)
+- ChartDetective (BSD-2-Clause), https://github.com/m-damien/ChartDetective
+  Adapted: chart reading in lib/pdf-charts.js: bars read from the box of any filled shape of a series (not only exact rectangles), and marker series read from the centres of their markers
+- tabula-java (MIT), https://github.com/tabulapdf/tabula-java
+  Adapted: the edges of filled rectangles used as ruling lines of a table (lib/pdf-layout.js, withFillEdges)
+- Camelot (MIT), https://github.com/camelot-dev/camelot
+  Adapted: the text-edge idea of the stream method (Nurminen): a table's columns leave aligned channels of white space (lib/pdf-layout.js, hasChannel)
+- pdf-inspector (MIT), https://github.com/firecrawl/pdf-inspector
+  Adapted: the approach of flagging pages whose text layer comes from a broken font encoding and reading only those pages with OCR (lib/ocr-languages.js garbledText, used by pdf-structure.js); the signals used here are superPDF's own
+- PDFFigures 2.0 (Apache-2.0), https://github.com/allenai/pdffigures2
+  Adapted: the idea of a figure region grown over nearby graphics that holds no body text, used to take images and drawn pictures set close together with no running text between them as one picture (lib/pdf-layout.js, pictureGroups); re-implemented, no code copied
+
+Bundled data
+------------
+- Tesseract OCR language data (tessdata_best, integer models as packaged in @tesseract.js-data 4.0.0_best_int),
+  Apache License 2.0, https://github.com/tesseract-ocr/tessdata_best
+  The lib/*.traineddata.gz files are these compressed models, used by tesseract.js for scanned pages.
