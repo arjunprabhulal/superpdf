@@ -23,7 +23,7 @@
 
 <img src="docs/assets/demo.gif" alt="Claude Code with the superPDF MCP server: asked to combine two invoices and list their vendor, number, due date and total, it calls superPDF three times and answers with the table" width="1000">
 
-<sub>Claude Code using the superPDF MCP server on two sample invoices, recorded with <a href="https://github.com/charmbracelet/vhs">VHS</a> from <a href="docs/demo/demo.tape">docs/demo/demo.tape</a>. The invoices are in <a href="docs/demo">docs/demo</a>.</sub>
+<sub>Claude Code using the superPDF MCP server on two sample invoices, recorded with <a href="https://github.com/charmbracelet/vhs">VHS</a> from <a href="docs/demo/demo.tape">docs/demo/demo.tape</a>. The typing is scripted; Claude's answer is live. The invoices are in <a href="docs/demo">docs/demo</a>.</sub>
 
 </div>
 
