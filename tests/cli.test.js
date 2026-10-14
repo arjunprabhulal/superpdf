@@ -78,7 +78,7 @@ test('outputs are never overwritten and missing files are explained', async () =
   await samplePdf(dir, 'a.pdf', 1);
   await cli(['merge', 'a.pdf', 'a.pdf', '--output', 'm.pdf'], dir);
   await assert.rejects(cli(['merge', 'a.pdf', 'a.pdf', '--output', 'm.pdf'], dir), /already exists/);
-  await assert.rejects(cli(['info', 'nope.pdf'], dir), /No file at nope\.pdf/);
+  await assert.rejects(cli(['info', 'nope.pdf'], dir), /No file at (.*[\\/])?nope\.pdf\./);
 });
 
 test('MCP server lists its tools and reads only inside --allow-dir', async () => {

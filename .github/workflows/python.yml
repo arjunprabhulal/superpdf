@@ -45,8 +45,13 @@ jobs:
       - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      # The integration tests run this commit's CLI (bin/superpdf.js), so a change is tested on its own code.
+      - run: npm ci
+        working-directory: .
       - run: uv sync --locked --all-extras
-      # The integration tests install the pinned @superpdf/cli from npm with the bundled Node.js, as users do.
       - run: uv run pytest -q -rs
 
   build:
