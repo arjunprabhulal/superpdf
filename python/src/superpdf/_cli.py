@@ -14,7 +14,7 @@ import tempfile
 from pathlib import Path
 
 # The @superpdf/cli version this package is tested with.
-CLI_VERSION = "0.3.0"
+CLI_VERSION = "0.3.1"
 NODE_MAJOR = 22
 
 

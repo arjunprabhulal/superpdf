@@ -7,6 +7,7 @@
   typed results (`WordResult`, `SlidesResult`, `EpubResult`, `TablesResult`, `Comparison`, `Outline`, `SavedFile`).
 - `add_page_labels` takes `position` (`"top"` or `"bottom"`).
 - `OfficeResult` is exported.
+- Uses `@superpdf/cli` 0.3.1.
 - Tested on Python 3.15 as well.
 
 ## 0.2.0

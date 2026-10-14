@@ -6,31 +6,54 @@ import {inspectPdf,transformPdf,runPipeline} from '../lib/pdf-core.js';
 import {cleanText,cleanValue} from '../contracts/untrusted.js';
 import {plainMessage} from '../contracts/errors.js';
 
-const help=`superPDF: PDF tools on your computer
+// Colour only on a terminal, and never with NO_COLOR set (no-color.org) or TERM=dumb; FORCE_COLOR turns it on.
+const useColor=process.env.FORCE_COLOR?process.env.FORCE_COLOR!=='0':!!process.stdout.isTTY&&!('NO_COLOR' in process.env)&&process.env.TERM!=='dumb';
+const paint=code=>text=>useColor?`\x1b[${code}m${text}\x1b[0m`:text;
+const bold=paint('1'),dim=paint('2'),green=paint('32'),cyan=paint('36');
+const section=(title,rows)=>`${bold(title)}\n${rows.map(([name,about])=>`  ${cyan(name.padEnd(10))}${about}`).join('\n')}`;
+const helpText=version=>`${bold('superPDF')} ${dim(version)}  PDF tools on your computer. Nothing is uploaded.
 
-Usage: superpdf <command> [options]   ·   superpdf help
+${bold('Usage:')} superpdf <command> [options]
 
-superpdf info input.pdf
-superpdf merge a.pdf b.pdf --output combined.pdf
-superpdf extract input.pdf --pages 1,3-5 --output selected.pdf
-superpdf rotate input.pdf --pages 2 --angle 90 --output rotated.pdf
-superpdf pipeline input.pdf --steps operations.json --output result.pdf
-superpdf export input.pdf --output input.md     (Markdown, HTML or JSON; --format, or from the extension)
-superpdf export input.pdf --tables html         (Markdown with tables written as HTML, as in the HTML export)
-superpdf convert report.docx --output report.pdf   (.docx .xlsx .pptx .odt .ods .odp; needs LibreOffice)
-superpdf audio input.pdf --output input.m4a   (read aloud with the macOS system voice; --pages, --voice, --speed slower|faster)
-superpdf mcp --allow-dir ~/Documents/PDFs   (MCP server for AI agents, over stdio)
-superpdf serve --allow-dir ~/Documents/PDFs (HTTP API on 127.0.0.1:7341; superpdf serve --help)
-superpdf tools                               (all 18 tools with their JSON input schemas)
-superpdf tool pdf_protect --input '{"input":"a.pdf","password":"…","output":"locked.pdf"}'   (run one tool; JSON result)
+${section('Read and convert',[
+  ['export','PDF to Markdown, HTML or JSON: headings, tables, charts as data, OCR for scans'],
+  ['info','Pages, page sizes, form fields and properties'],
+  ['convert','Word, Excel or PowerPoint to PDF (needs LibreOffice)'],
+  ['audio','Read a PDF aloud with the macOS system voice'],
+])}
 
-Files are processed on this computer. Nothing is uploaded.
-export reads scanned pages (no text layer) with superPDF OCR (English and 14 other languages, told from the page), as the app does; --no-ocr skips it.
-audio uses macOS's built-in voice (say); list voices with: say -v '?'
-convert uses LibreOffice on this computer (brew install --cask libreoffice); set SUPERPDF_SOFFICE to its soffice path if it isn't found.
-Outputs must be new files; existing files are never overwritten.
-Limits: no page limit; files up to 2 GB.
-The MCP server and the HTTP API can only use files inside the --allow-dir folders.
+${section('Edit pages',[
+  ['merge','Combine PDFs into one'],
+  ['extract','Keep only some pages'],
+  ['rotate','Rotate pages'],
+  ['pipeline','Several steps on one PDF, saved once'],
+])}
+
+${section('For AI agents and code',[
+  ['tools','Every tool with its JSON input schema (Word, Excel, forms, compare and more)'],
+  ['tool','Run one tool: JSON in, JSON out'],
+  ['mcp','MCP server for AI assistants, over stdio'],
+  ['serve','Local HTTP API on 127.0.0.1:7341 (superpdf serve --help)'],
+])}
+
+${bold('Examples')}
+  ${green('superpdf export report.pdf --output report.md')}        ${dim('# or .html / .json')}
+  ${green('superpdf export report.pdf --tables html')}             ${dim('# tables as HTML, merged cells kept')}
+  ${green('superpdf merge a.pdf b.pdf --output combined.pdf')}
+  ${green('superpdf extract report.pdf --pages 1,3-5 --output part.pdf')}
+  ${green('superpdf rotate scan.pdf --pages 2 --angle 90 --output upright.pdf')}
+  ${green('superpdf tool pdf_to_docx --input \'{"input":"report.pdf","output":"report.docx"}\'')}
+  ${green('superpdf mcp --allow-dir ~/Documents/PDFs')}
+
+${bold('Good to know')}
+  ${dim('•')} Outputs are always new files; existing files are never overwritten.
+  ${dim('•')} No page limit; files up to 2 GB.
+  ${dim('•')} Scanned pages are read with OCR in English and 14 other languages; --no-ocr skips it.
+  ${dim('•')} mcp, serve and tool only use files inside the --allow-dir folders.
+  ${dim('•')} convert: brew install --cask libreoffice, or set SUPERPDF_SOFFICE to its soffice path.
+  ${dim('•')} audio: --pages, --voice (list them with say -v '?'), --speed slower|faster.
+
+${dim('Docs:')} https://superpdf.ai/docs/mcp-api/command-line-tools
 `;
 /**
  * Markdown as toMarkdown (lib/pdf-structure.js) writes it, with each table as the HTML export's table (colspans and
@@ -76,7 +99,7 @@ else try {
  const args=process.argv.slice(2).flatMap((arg,i,all)=>/^-\d/.test(arg)?(takesValue(all[i-1])?[]:[`./${arg}`]):/^-\d/.test(all[i+1]||'')&&takesValue(arg)?[`${arg}=${all[i+1]}`]:[arg]);
  const {values,positionals}=parseArgs({args,allowPositionals:true,options});
  if(values.version||positionals[0]==='version'){process.stdout.write(`${JSON.parse(await readFile(new URL('../package.json',import.meta.url),'utf8')).version}\n`);}
- else if(values.help||!positionals.length||positionals[0]==='help'){process.stdout.write(help);process.exitCode=0;}
+ else if(values.help||!positionals.length||positionals[0]==='help'){process.stdout.write(helpText(JSON.parse(await readFile(new URL('../package.json',import.meta.url),'utf8')).version));process.exitCode=0;}
  else {
   const [action,...inputs]=positionals;
   if(!actions.has(action))throw new Error(`Unsupported command: ${action}. Run superpdf help.`);

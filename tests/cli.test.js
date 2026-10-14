@@ -42,7 +42,9 @@ test('PDF.js data folders end in / on every platform, Windows paths included', a
 test('version and help', async () => {
   const { version } = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
   assert.equal((await cli(['--version'])).stdout.trim(), version);
-  assert.match((await cli(['help'])).stdout, /Usage: superpdf <command>/);
+  const help = (await cli(['help'])).stdout;
+  assert.match(help, /Usage: superpdf <command>/);
+  assert.doesNotMatch(help, /\b\d+ tools\b/, 'help must not hard-code a tool count (superpdf tools lists them)');
 });
 
 test('merge, extract, rotate and pipeline write new PDFs with the right pages', async () => {
