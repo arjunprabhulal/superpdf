@@ -4,6 +4,7 @@ import json
 import os
 import subprocess
 import sys
+import types
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,14 @@ from superpdf import _cli
 ROOT = Path(__file__).resolve().parents[2]
 EXAMPLE = ROOT / "examples" / "quarterly-report.pdf"
 TWO_PAGES = "# One\n\nFirst page.\n\n<!-- end of page 1 -->\n\nSecond page.\n\n<!-- end of page 2 -->\n"
+
+
+def _fake_subprocess(run: Any) -> types.SimpleNamespace:
+    """Replaces subprocess for superpdf._cli only, so Python's own subprocess calls (e.g. platform on Windows) are
+    untouched."""
+    return types.SimpleNamespace(
+        run=run, CompletedProcess=subprocess.CompletedProcess, TimeoutExpired=subprocess.TimeoutExpired
+    )
 
 
 class Recorder:
@@ -34,7 +43,7 @@ class Recorder:
 def fake(monkeypatch: pytest.MonkeyPatch) -> Recorder:
     recorder = Recorder(stdout=TWO_PAGES)
     monkeypatch.setattr(_cli, "command", lambda: ["superpdf"])
-    monkeypatch.setattr(_cli.subprocess, "run", recorder)
+    monkeypatch.setattr(_cli, "subprocess", _fake_subprocess(recorder))
     return recorder
 
 
@@ -84,7 +93,7 @@ def test_timeout_becomes_a_superpdf_error(monkeypatch: pytest.MonkeyPatch) -> No
         raise subprocess.TimeoutExpired(cmd, kwargs["timeout"])
 
     monkeypatch.setattr(_cli, "command", lambda: ["superpdf"])
-    monkeypatch.setattr(_cli.subprocess, "run", slow)
+    monkeypatch.setattr(_cli, "subprocess", _fake_subprocess(slow))
     with pytest.raises(superpdf.SuperPDFError, match="within 5 seconds"):
         superpdf.export("a.pdf", timeout=5)
 
@@ -134,7 +143,7 @@ def npm_install(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> list[list[st
     monkeypatch.delenv("SUPERPDF_BIN", raising=False)
     monkeypatch.setenv("SUPERPDF_CACHE_DIR", str(tmp_path))
     monkeypatch.setattr(_cli, "_node", lambda: ("/opt/node", ["/opt/node", "/opt/npm-cli.js"]))
-    monkeypatch.setattr(_cli.subprocess, "run", fake_run)
+    monkeypatch.setattr(_cli, "subprocess", _fake_subprocess(fake_run))
     return calls
 
 
@@ -155,7 +164,9 @@ def test_failed_install_is_explained_and_leaves_nothing(monkeypatch: pytest.Monk
     monkeypatch.setenv("SUPERPDF_CACHE_DIR", str(tmp_path))
     monkeypatch.setattr(_cli, "_node", lambda: ("/opt/node", ["npm"]))
     monkeypatch.setattr(
-        _cli.subprocess, "run", lambda cmd, **kw: subprocess.CompletedProcess(cmd, 1, "", "npm error network\n")
+        _cli,
+        "subprocess",
+        _fake_subprocess(lambda cmd, **kw: subprocess.CompletedProcess(cmd, 1, "", "npm error network\n")),
     )
     with pytest.raises(superpdf.SuperPDFError, match=r"Couldn't install @superpdf/cli@.*npm error network"):
         superpdf.install_cli()
