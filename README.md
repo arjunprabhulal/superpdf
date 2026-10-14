@@ -9,7 +9,7 @@
 
 ### superPDF AI: a PDF reader, CLI and MCP server that run on your computer.
 
-**Tables, charts, headings and scans to Markdown, HTML or JSON, in plain code with no AI model. Nothing is uploaded.**
+**Tables, charts, headings and scans to Markdown, HTML or JSON, read by rules, not a language model; scans go through Tesseract OCR. Nothing is uploaded.**
 
 [![CI](https://img.shields.io/github/actions/workflow/status/arjunprabhulal/superpdf/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/arjunprabhulal/superpdf/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/@superpdf/cli?style=flat-square&color=4338ca)](https://www.npmjs.com/package/@superpdf/cli) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-555555?style=flat-square)](LICENSE) [![Node.js 22+](https://img.shields.io/badge/Node.js-22%2B-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org) [![MCP server](https://img.shields.io/badge/MCP-server-4338ca?style=flat-square)](#use-it-from-your-ai-assistant-mcp)
 
@@ -54,9 +54,10 @@ superpdf help
 
 ### Use it from your AI assistant (MCP)
 
-For Claude Code:
+Create the folder the assistant may use, then add the server. For Claude Code:
 
 ```bash
+mkdir -p ~/Documents/superPDF
 claude mcp add --scope user superpdf -- npx -y @superpdf/cli mcp --allow-dir ~/Documents/superPDF
 ```
 
@@ -85,7 +86,7 @@ superpdf serve --allow-dir ~/Documents/superPDF
 ```
 
 This starts a private API on `127.0.0.1` that only this computer can reach. It prints a token when it starts (or set
-`SUPERPDF_API_TOKEN`, at least 32 characters); every request needs it. Guide and reference:
+`SUPERPDF_API_TOKEN`, at least 32 characters); every request under `/v1/` needs it. Guide and reference:
 [superpdf.ai/docs/api](https://superpdf.ai/docs/api).
 
 ## What it reads
@@ -94,12 +95,12 @@ This starts a private API on `127.0.0.1` that only this computer can reach. It p
 
 | Part of the PDF | How superPDF reads it |
 |---|---|
-| **Tables** | Ruled tables from their lines and shaded rows, borderless tables from aligned text; `--tables html` keeps merged header cells |
-| **Charts** | Bar, line and pie charts drawn as shapes, turned into tables of values (marked as measured, so approximate) |
+| **Tables** | Ruled tables from their lines (shading inside them splits rows), borderless tables from aligned text; `--tables html` keeps merged header cells |
+| **Charts** | Bar, line, dot, area and pie charts drawn as shapes, turned into tables of values; values measured from the drawing, not printed on it, are marked approximate |
 | **Structure** | Headings and their levels, paragraphs, lists, bold and italic text, page headers and footers |
 | **Reading order** | Multi-column pages split at their column gaps, so the text reads in order |
 | **Scans** | Pages without a text layer are read with Tesseract OCR in English and 14 other languages; the language data is bundled, so nothing is downloaded |
-| **Big files** | No file size or page limit |
+| **Big files** | No page limit; files up to 2 GB |
 
 ## Commands
 
@@ -115,8 +116,8 @@ superpdf pipeline document.pdf --steps steps.json --output result.pdf
 superpdf audio document.pdf --output document.m4a             # read aloud with the macOS system voice
 ```
 
-Results are always written to a new file; existing files are never overwritten. `superpdf help` lists every option.
-Try them on [`examples/quarterly-report.pdf`](examples/quarterly-report.pdf).
+Results are always written to a new file; existing files are never overwritten. `superpdf help` shows every command.
+Try `info` and `export` on [`examples/quarterly-report.pdf`](examples/quarterly-report.pdf), a one-page report.
 
 ## MCP tools
 
@@ -138,51 +139,52 @@ Most PDF-to-text tools take the text layer and sort it by position, or run an AI
 superPDF works from the PDF's own drawing instructions, which keeps exact text and positions and recovers things both
 approaches tend to lose:
 
-- **Charts become data.** Bars, lines, dots, areas and pie slices are drawn as shapes; `pdf-charts.js` measures them
-  against the axis labels (or, without an axis, against the values printed on the bars) and matches series to their
-  legend colours. Charts saved as pictures fall back to reading the bars' pixels.
-- **Lost letters are recovered.** When a font has no proper Unicode table, PDF.js reads its letters as spaces.
+- **Charts become data.** Bars, lines, dots, areas and pie slices are drawn as shapes; `pdf-charts.js` measures bars,
+  lines, dots and areas against the axis labels (or, without an axis, against the values printed on them), reads pie
+  slices from their angles, and matches series to their legend colours. Charts saved as pictures fall back to reading the bars' pixels.
+- **Lost letters are recovered.** When a font has no proper Unicode table, PDF.js reads its letters as blanks or leaves them out.
   `pdf-text-fixes.js` matches each glyph's outline against letters it has already identified, and checks TrueType
   fonts against the standard Mac glyph order, then puts the letters back.
 - **Bold is measured, not guessed.** Font names are often hidden (`F1`, `g_d0_f2`), so `pdf-structure.js` measures the
   glyphs' stroke thickness, compares the widths of two cuts of one font, and detects text drawn twice or outlined to
   look bold. On scans it measures the ink thickness of each word.
 - **Spacing and hidden text are fixed.** False spaces that PDF.js inserts in letter-spaced words and around Chinese
-  and Japanese characters are removed by measuring the glyphs the page draws, text the author cropped away (clipped)
-  is left out, and Arabic lam-alef ligatures that come out with their letters swapped are corrected.
+  and Japanese characters are removed by measuring the glyphs the page draws, text drawn outside a rectangular clipping
+  area is left out, and Arabic lam-alef ligatures that come out with their letters swapped are corrected.
 - **OCR only where it's needed.** Whole scanned pages, pages whose font encoding is garbled, and pictures that contain
   text (checked first for letter-like shapes, so photos don't produce noise). The language comes from the PDF's
   language tag or the text itself, and a poor reading is retried with Sauvola thresholding.
-- **Tables three ways.** Ruled lines and shaded rows, lines found in the pixels of scanned pages, and borderless tables
-  from aligned columns of text.
+- **Tables three ways.** Ruled lines, lines found in the pixels of scanned pages, and borderless tables from aligned
+  columns of text (on pages with a text layer).
 
 ## How it compares
 
 On [ParseBench](https://www.parsebench.ai), in **our own run** of its open-source test suite on all 2,078 documents,
 superPDF scores **65.0** overall (64.8 on documents it was never tuned on). It is not on the official leaderboard yet.
-The other scores are from the public leaderboard (October 12, 2026).
+The other scores are a selection from the public leaderboard (October 12, 2026).
 
 | Parser | Overall | Tables | Charts | Content | Formatting | Grounding |
 |---|---|---|---|---|---|---|
 | LlamaParse Agentic Plus (paid service) | 90.2 | 93.4 | 94.2 | 92.3 | 87.1 | 84.1 |
 | Claude Opus 5.5 (AI model) | 78.0 | 93.9 | 64.1 | 91.8 | 77.0 | 63.2 |
-| **superPDF** (plain code, our run) | **65.0** | 68.4 | 52.2 | 80.5 | 62.3 | 61.5 |
+| **superPDF** (no language model, our run) | **65.0** | 68.4 | 52.2 | 80.5 | 62.3 | 61.5 |
 | Azure Document Intelligence | 59.6 | 86.0 | 1.6 | 84.9 | 51.9 | 73.8 |
 | Docling | 50.6 | 66.4 | 52.8 | 66.9 | 1.0 | 66.1 |
 | Google Cloud Document AI | 50.4 | 55.1 | 1.4 | 83.7 | 50.5 | 61.3 |
 | AWS Textract | 47.9 | 84.6 | 6.0 | 74.8 | 3.7 | 70.4 |
 
-superPDF is strongest on charts and formatting, which many services don't extract. Azure and Textract read tables
-better, and AI models score higher overall. Full table and method: [superpdf.ai/performance](https://superpdf.ai/performance).
+Compared with the Azure, Google and AWS services, superPDF scores much higher on charts and higher on formatting; Azure and
+Textract score higher on tables. LlamaParse and Claude Opus 5.5 score higher overall. Full table and method:
+[superpdf.ai/performance](https://superpdf.ai/performance).
 
 ## How it works
 
 1. **Read.** [PDF.js](https://github.com/mozilla/pdf.js) gives the text with its fonts and positions, and the
    drawing operations (lines, rectangles, curves).
-2. **Repair.** Letters drawn without a Unicode mapping are recovered from their outlines, and spacing is fixed.
-3. **Rebuild.** Rules group the text into lines and blocks, find table grids and borderless columns, read charts from
+2. **Recognize.** Scanned or garbled pages, and pictures that contain text, go through Tesseract OCR.
+3. **Repair.** Letters drawn without a Unicode mapping are recovered from their outlines, and spacing is fixed.
+4. **Rebuild.** Rules group the text into lines and blocks, find table grids and borderless columns, read charts from
    their shapes and axis labels, size headings from the fonts and order columns for reading.
-4. **Recognize.** Pages without text go through Tesseract OCR.
 5. **Write.** Markdown, HTML or JSON; the JSON keeps each block's page and position.
 
 The reader lives in [`lib/`](lib): `pdf-structure.js` (pages to blocks), `pdf-layout.js` (lines, tables, reading
@@ -191,11 +193,11 @@ tabula-java and others are credited in [NOTICE](NOTICE).
 
 ## Privacy and security
 
-- Everything runs on your computer. The only network requests are the job callbacks (webhooks) you configure for the
+- Everything runs on your computer. The only network requests superPDF makes are the job callbacks (webhooks) you configure for the
   API; the OCR language data is in the package.
 - The MCP server and the API read and write only inside the `--allow-dir` folders; paths are resolved through
   symlinks, so they can't escape.
-- The API listens on `127.0.0.1` only and needs its bearer token on every request.
+- The API listens on `127.0.0.1` only and needs its bearer token on every request under `/v1/`.
 - Outputs are written to new files; existing files are never overwritten.
 
 Found a security issue? See [SECURITY.md](SECURITY.md).

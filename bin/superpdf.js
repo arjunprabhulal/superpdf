@@ -27,7 +27,7 @@ export reads scanned pages (no text layer) with superPDF OCR (English and 14 oth
 audio uses macOS's built-in voice (say); list voices with: say -v '?'
 convert uses LibreOffice on this computer (brew install --cask libreoffice); set SUPERPDF_SOFFICE to its soffice path if it isn't found.
 Outputs must be new files; existing files are never overwritten.
-Limits: none on file size or pages.
+Limits: no page limit; files up to 2 GB.
 The MCP server and the HTTP API can only use files inside the --allow-dir folders.
 `;
 /**
