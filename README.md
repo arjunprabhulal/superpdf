@@ -21,7 +21,9 @@
 
 <br><br>
 
-<img src="docs/assets/agent-session.png" alt="A real Claude Code session: asked to combine two invoices and list their vendor, number, due date and total, Claude calls superPDF's pdf_merge and pdf_read_text tools and answers with the correct table" width="1000">
+<img src="docs/assets/demo.gif" alt="Claude Code with the superPDF MCP server: asked to combine two invoices and list their vendor, number, due date and total, it calls superPDF three times and answers with the table" width="1000">
+
+<sub>Claude Code using the superPDF MCP server on two sample invoices, recorded with <a href="https://github.com/charmbracelet/vhs">VHS</a> from <a href="docs/demo/demo.tape">docs/demo/demo.tape</a>. The invoices are in <a href="docs/demo">docs/demo</a>.</sub>
 
 </div>
 
