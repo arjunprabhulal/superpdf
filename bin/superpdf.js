@@ -39,6 +39,7 @@ ${section('For AI agents and code',[
 ${bold('Examples')}
   ${green('superpdf export report.pdf --output report.md')}        ${dim('# or .html / .json')}
   ${green('superpdf export report.pdf --tables html')}             ${dim('# tables as HTML, merged cells kept')}
+  ${green('superpdf export https://example.com/r.pdf -o r.md')}    ${dim('# a PDF from an https:// link')}
   ${green('superpdf merge a.pdf b.pdf --output combined.pdf')}
   ${green('superpdf extract report.pdf --pages 1,3-5 --output part.pdf')}
   ${green('superpdf rotate scan.pdf --pages 2 --angle 90 --output upright.pdf')}
@@ -48,6 +49,8 @@ ${bold('Examples')}
 ${bold('Notes')}
   ${dim('•')} Outputs are always new files; existing files are never overwritten.
   ${dim('•')} No page limit; files up to 2 GB.
+  ${dim('•')} export also reads https:// links: up to 2 GB, stopping after 60 s without data; links to this
+    computer or the local network are refused, and the download is deleted after reading.
   ${dim('•')} Scanned pages are read with OCR in English and 14 other languages; --no-ocr skips it.
   ${dim('•')} mcp, serve and tool only use files inside the --allow-dir folders.
   ${dim('•')} convert: brew install --cask libreoffice, or set SUPERPDF_SOFFICE to its soffice path.
@@ -112,7 +115,14 @@ else try {
   // Owner-only encryption is removed so the file can be read; a PDF that needs a password to open is refused.
   const {openWithoutPassword}=await import('../contracts/tools.js');
   const bytes=[];let pages=0;
-  for(const file of inputs){const info=await stat(file);if(!info.isFile())throw new Error(`${file} isn’t a file. Provide a path to a PDF.`);let data=await readFile(file);if(!data.length)throw new Error(`${file} is empty (0 bytes), so it isn’t a PDF.`);data=await openWithoutPassword(new Uint8Array(data));const pdf=await PDFDocument.load(data).catch(error=>{throw Object.assign(new Error(`${file}: ${plainMessage(error)}`),{plain:true});});pages+=pdf.getPageCount();bytes.push(data);}
+  const {isLink,downloadPdf}=await import('../lib/download.js');
+  for(const file of inputs){
+   // export also reads an https:// link (lib/download.js); the other commands, mcp, serve and tool read files only.
+   let data;
+   if(isLink(file)){if(action!=='export')throw Object.assign(new Error(`${action} reads files on this computer. Only superpdf export reads https:// links; download the PDF first.`),{plain:true});data=await downloadPdf(file);}
+   else{const info=await stat(file);if(!info.isFile())throw new Error(`${file} isn’t a file. Provide a path to a PDF.`);data=await readFile(file);}
+   if(!data.length)throw new Error(`${file} is empty (0 bytes), so it isn’t a PDF.`);data=await openWithoutPassword(new Uint8Array(data));const pdf=await PDFDocument.load(data).catch(error=>{throw Object.assign(new Error(`${file}: ${plainMessage(error)}`),{plain:true});});pages+=pdf.getPageCount();bytes.push(data);
+  }
   // Metadata and page text are untrusted: printed without terminal controls or bidi overrides.
   if(action==='info')process.stdout.write(JSON.stringify(cleanValue(await inspectPdf(bytes[0])),null,2)+'\n');
   else if(action==='audio'){

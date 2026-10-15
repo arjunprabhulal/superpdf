@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- `superpdf export https://example.com/report.pdf --output report.md` reads a PDF from an https:// link. Other
+  schemes (http:, file:, data:) are refused, and so are hosts on this computer or the local network, checked on the
+  address each connection uses, at every redirect (up to 5). Downloads stop at 2 GB or after 60 seconds without data,
+  must start like a PDF (otherwise the message names the content type the server sent), and go to a temporary file
+  that is removed afterwards. The MCP server, the local API and `superpdf tool` still take files only.
+
 ## 0.4.1
 
 - Markdown tables (`superpdf export`, `pdf_extract_structure`, the SDK's `exportPdf`): a cell's own backslash before a
