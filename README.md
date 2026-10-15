@@ -15,7 +15,7 @@
 
 **[Website](https://superpdf.ai) · [Docs](https://superpdf.ai/docs/mcp-api/command-line-tools) · [Python docs](https://superpdf.ai/docs/python) · [Benchmark](https://superpdf.ai/performance) · [Changelog](CHANGELOG.md)**
 
-[How it compares](#how-it-compares) · [Quick start](#quick-start) · [Python](#use-it-from-python) · [MCP tools](#mcp-tools) · [How it works](#how-it-works)
+[How it compares](#how-it-compares) · [Quick start](#quick-start) · [JavaScript/TypeScript](#use-it-from-javascript-or-typescript) · [Python](#use-it-from-python) · [MCP tools](#mcp-tools) · [How it works](#how-it-works)
 
 <code>npx @superpdf/cli export report.pdf --output report.md</code>
 
@@ -42,6 +42,7 @@ that powers [superpdf.ai](https://superpdf.ai) in the browser.
 | Command line with Homebrew | `brew install arjunprabhulal/superpdf/superpdf` | [Tap](https://github.com/arjunprabhulal/homebrew-superpdf) |
 | MCP server for AI assistants | `superpdf mcp --allow-dir ~/Documents/superPDF` | [MCP setup](https://superpdf.ai/docs/mcp-api/mcp-tool-access) |
 | Local REST API (OpenAPI 3.1) | `superpdf serve --allow-dir ~/Documents/superPDF` | [API](https://superpdf.ai/docs/api) |
+| JavaScript and TypeScript SDK | `npm install @superpdf/cli`, then `import { toDocx } from '@superpdf/cli'` | [SDK](#use-it-from-javascript-or-typescript) |
 | Python SDK | `pip install superpdf` or `uv add superpdf` | [Python](https://superpdf.ai/docs/python) |
 | Python, without installing | `uvx superpdf …` or `pipx run superpdf …` | [Python](https://superpdf.ai/docs/python#command) |
 | LangChain | `pip install langchain-superpdf` | [Loader](https://superpdf.ai/docs/python/langchain-llamaindex#langchain) |
@@ -140,6 +141,26 @@ docs = SuperPDFLoader("report.pdf").load()
 
 Node.js comes with the package. All 30 tools, a LlamaIndex reader and the full reference are in the
 [Python docs](https://superpdf.ai/docs/python) and [python/README.md](python/README.md).
+
+### Use it from JavaScript or TypeScript
+
+```bash
+npm install @superpdf/cli
+```
+
+```ts
+import { exportPages, extractTables, toDocx, SuperPDFError } from '@superpdf/cli';
+
+const pages = await exportPages('report.pdf');          // [{ page: 1, markdown: '# Quarterly report…' }]
+const word = await toDocx({ input: 'report.pdf', output: 'report.docx' });
+await extractTables({ input: 'report.pdf', format: 'csv', output: 'tables.csv' });
+```
+
+Every tool is an async function (`merge`, `split`, `fillForm`, `compare`, `runBatch` and the rest; `tools()` lists
+them) that takes the tool's JSON input and returns its typed result. It runs in your Node.js process (22 or later):
+no server, no subprocess. TypeScript types come with the package, generated from the same schemas as the MCP server
+and the API. Errors are `SuperPDFError` with a `code` (`validation`, `conflict`, `not_found`, `operation_failed`).
+Each call may only use the folders of the paths you give it, or the ones you pass as `{ allowDirs }`.
 
 ### Use it from your own code (REST API)
 

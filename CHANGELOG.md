@@ -1,7 +1,13 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
 
+- JavaScript and TypeScript SDK: `import { toDocx, merge, exportPages } from '@superpdf/cli'`. Every tool is an async
+  function that runs in the calling Node.js process, with TypeScript types generated from the tool schemas
+  (`sdk/index.d.ts`, `npm run sdk:types`; a test fails when they drift). `exportPdf`, `exportJson` and
+  `exportPages` read a path or bytes as `superpdf export` does. Errors are `SuperPDFError` with the local API's
+  problem codes; `{ allowDirs }` and `{ onProgress }` work on every call.
+- `superpdf export` and the SDK share one export module (`lib/export.js`); the output is unchanged.
 - Homebrew: `brew install arjunprabhulal/superpdf/superpdf` (macOS and Linux, prebuilt for Apple silicon and Linux).
 - `integrations/`: `langchain-superpdf` and `llama-index-readers-superpdf` packages.
 

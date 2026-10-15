@@ -1,6 +1,6 @@
 {
   "name": "@superpdf/cli",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "superPDF AI on your computer: PDF tools for Terminal, scripts and AI agents (command-line tool, MCP server and local API)",
   "keywords": [
     "pdf",
@@ -22,6 +22,10 @@
     "superpdf": "bin/superpdf.js"
   },
   "exports": {
+    ".": {
+      "types": "./sdk/index.d.ts",
+      "default": "./sdk/index.js"
+    },
     "./core": "./lib/pdf-core.js"
   },
   "files": [
@@ -30,14 +34,16 @@
     "mcp",
     "api",
     "contracts",
+    "sdk",
     "openapi.json",
     "README.md",
     "LICENSE",
     "NOTICE"
   ],
   "scripts": {
-    "test": "node --test tests/*.test.js",
-    "openapi": "node scripts/openapi.js"
+    "test": "node --test tests/*.test.js && tsc -p tests/types",
+    "openapi": "node scripts/openapi.js",
+    "sdk:types": "node scripts/sdk-types.js"
   },
   "engines": {
     "node": ">=22"
@@ -69,10 +75,13 @@
   },
   "devDependencies": {
     "@tesseract.js-data/eng": "1.0.0",
+    "json-schema-to-typescript": "16.0.0",
+    "typescript": "7.0.2",
     "zod-openapi": "6.0.2"
   },
   "author": {
     "name": "Arjun Prabhulal",
     "url": "https://arjunprabhulal.com"
-  }
+  },
+  "types": "./sdk/index.d.ts"
 }
