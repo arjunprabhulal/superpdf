@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "superPDF local API",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "description": "The superPDF tools over HTTP, served by `superpdf serve --allow-dir <folder>` on this computer only (127.0.0.1). The same tools, schemas, folder scope and no-overwrite rules as the superPDF MCP server. Documents never leave the computer: requests carry file paths inside the allowed folders, not file contents. Errors are RFC 9457 problem details."
   },
   "servers": [
