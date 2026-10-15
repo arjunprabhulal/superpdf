@@ -197,6 +197,7 @@ superpdf extract document.pdf --pages 1,3-5 --output selected.pdf
 superpdf rotate document.pdf --pages 2 --angle 90 --output rotated.pdf
 superpdf export document.pdf --output document.md             # or .html / .json (--format)
 superpdf export document.pdf --tables html --output doc.md    # tables as HTML, keeping merged header cells
+superpdf export https://example.com/a.pdf --output a.md       # a PDF from an https:// link
 superpdf convert report.docx --output report.pdf              # Word, Excel, PowerPoint; needs LibreOffice
 superpdf pipeline document.pdf --steps steps.json --output result.pdf
 superpdf audio document.pdf --output document.m4a             # read aloud with the macOS system voice
@@ -206,6 +207,11 @@ superpdf tool pdf_protect --input '{"input":"a.pdf","password":"…","output":"l
 
 Results are always written to a new file; existing files are never overwritten. `superpdf help` shows every command.
 Try `info` and `export` on [`examples/quarterly-report.pdf`](examples/quarterly-report.pdf), a one-page report.
+
+`export` also reads an https:// link: up to 2 GB, stopping after 60 seconds without data and following up to 5
+redirects. Links to this computer or the local network (localhost, private and link-local addresses) are refused at
+every redirect, anything that isn't a PDF is refused, and the download is deleted once it's read. Only `export` takes
+links; `mcp`, `serve` and `tool` read files inside their `--allow-dir` folders.
 
 ## MCP tools
 
