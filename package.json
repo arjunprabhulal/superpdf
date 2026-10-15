@@ -83,5 +83,8 @@
     "name": "Arjun Prabhulal",
     "url": "https://arjunprabhulal.com"
   },
-  "types": "./sdk/index.d.ts"
+  "types": "./sdk/index.d.ts",
+  "overrides": {
+    "image-size": "^2.0.4"
+  }
 }
