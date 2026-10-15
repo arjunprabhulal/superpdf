@@ -29,7 +29,7 @@ async function declare(schema, name) {
     maxItems: -1, // plain arrays for bounded lists (steps: 1-10), not every tuple length
     style: { singleQuote: true },
   });
-  return text.replace(/^export interface/m, 'export interface').trim();
+  return text.trim();
 }
 
 const HEADER = `// superPDF AI SDK types, generated from the tool schemas by scripts/sdk-types.js. Do not edit by hand.
