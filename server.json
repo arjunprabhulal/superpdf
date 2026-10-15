@@ -1,0 +1,32 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.arjunprabhulal/superpdf",
+  "title": "superPDF AI",
+  "description": "PDF tools on your computer: read, convert, edit, merge, fill and compare PDFs. Nothing is uploaded.",
+  "websiteUrl": "https://superpdf.ai/docs/mcp-api/mcp-tool-access",
+  "repository": {
+    "url": "https://github.com/arjunprabhulal/superpdf",
+    "source": "github"
+  },
+  "version": "0.4.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@superpdf/cli",
+      "version": "0.4.1",
+      "transport": { "type": "stdio" },
+      "packageArguments": [
+        { "type": "positional", "value": "mcp" },
+        {
+          "type": "named",
+          "name": "--allow-dir",
+          "description": "A folder the server may read PDFs from and write new files to (repeat for more folders)",
+          "format": "filepath",
+          "isRequired": true,
+          "isRepeated": true
+        }
+      ]
+    }
+  ]
+}

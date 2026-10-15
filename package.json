@@ -2,6 +2,7 @@
   "name": "@superpdf/cli",
   "version": "0.4.1",
   "description": "superPDF AI on your computer: PDF tools for Terminal, scripts and AI agents (command-line tool, MCP server and local API)",
+  "mcpName": "io.github.arjunprabhulal/superpdf",
   "keywords": [
     "pdf",
     "pdf-ai",
