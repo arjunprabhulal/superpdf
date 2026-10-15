@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1
+
+- Uses `@superpdf/cli` 0.4.1, which fixes Markdown table cells that hold a backslash before a pipe. No change to the
+  Python API; the version matches the npm package.
+
 ## 0.4.0
 
 - Uses `@superpdf/cli` 0.4.0, which adds the JavaScript and TypeScript SDK. No change to the Python API; the

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1
+
+- Markdown tables (`superpdf export`, `pdf_extract_structure`, the SDK's `exportPdf`): a cell's own backslash before a
+  pipe no longer cancels that pipe's escape and splits the cell. Backslashes in cells are escaped.
+- Dependencies: `image-size` 2.0.4 for PowerPoint export (pptxgenjs asks for 1.x; 2.0.3 and later fix
+  denial-of-service bugs in its JXL, HEIF and ICNS parsers).
+
 ## 0.4.0
 
 - JavaScript and TypeScript SDK: `import { toDocx, merge, exportPages } from '@superpdf/cli'`. Every tool is an async
