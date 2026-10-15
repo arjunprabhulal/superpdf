@@ -28,7 +28,8 @@ You need Node.js 22 or later. The code is plain JavaScript (ES modules), with no
 | `contracts/` | The tool definitions shared by the CLI, the MCP server, the API and the Python package. After changing one, run `npm run openapi` to rebuild `openapi.json` |
 | `mcp/` | The MCP server, including the folder rules for `--allow-dir` |
 | `api/` | The local REST API, jobs and webhooks |
-| `scripts/` | `openapi.js`, which writes `openapi.json` from the tool definitions |
+| `sdk/` | The JavaScript and TypeScript SDK (`import ... from '@superpdf/cli'`); `index.d.ts` is generated |
+| `scripts/` | `openapi.js` and `sdk-types.js`, which write `openapi.json` and `sdk/index.d.ts` from the tool definitions. After changing a tool, run `npm run openapi` and `npm run sdk:types` |
 | `python/` | The Python package (`pip install superpdf`); see [python/README.md](python/README.md) |
 | `integrations/` | `langchain-superpdf` (LangChain document loader) and `llama-index-readers-superpdf` (LlamaIndex reader), each its own PyPI package |
 | `tests/` | End-to-end tests (`npm test`) |

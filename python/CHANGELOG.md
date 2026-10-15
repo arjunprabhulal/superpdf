@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0
+
+- Uses `@superpdf/cli` 0.4.0, which adds the JavaScript and TypeScript SDK. No change to the Python API; the
+  version matches the npm package.
+
 ## 0.3.1
 
 The first 0.3 release on PyPI, numbered to match `@superpdf/cli` 0.3.1 (0.3.0 was never published).

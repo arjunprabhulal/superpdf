@@ -130,7 +130,7 @@ __all__ = [
     "tools",
     "unlock",
 ]
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 
 _PAGE_END = re.compile(r"^<!-- end of page (\d+) -->\s*$", re.MULTILINE)
 

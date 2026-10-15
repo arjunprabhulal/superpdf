@@ -31,6 +31,19 @@ export function describeTools() {
   }));
 }
 
+/**
+ * The first problem with a tool's input, as one sentence: "Invalid input. angle: use 90, 180 or 270." Names the
+ * allowed values when the schema lists them. Shared with the SDK (sdk/index.js).
+ */
+export function invalidInput(contract, zodError) {
+  const issue = zodError.issues[0];
+  const field = issue.path.join('.') || 'input';
+  const property = z.toJSONSchema(contract.input, { io: 'input' }).properties?.[issue.path[0]];
+  const choices = property?.enum ?? property?.anyOf?.map(option => option.const).filter(value => value !== undefined);
+  const hint = choices?.length ? `use ${choices.slice(0, -1).join(', ')}${choices.length > 1 ? ' or ' : ''}${choices.at(-1)}` : issue.message;
+  return { field, detail: `Invalid input. ${field}: ${hint}.`, errors: zodError.issues.map(i => ({ field: i.path.join('.') || 'input', message: i.message })) };
+}
+
 export async function main(argv) {
   const [command, ...rest] = argv;
   if (command === 'tools') {
@@ -52,15 +65,7 @@ export async function main(argv) {
   let raw;
   try { raw = JSON.parse(text); } catch { throw new Error('--input must be JSON, such as {"input": "report.pdf"}.'); }
   const parsed = contract.input.safeParse(raw);
-  if (!parsed.success) {
-    const issue = parsed.error.issues[0];
-    const field = issue.path.join('.') || 'input';
-    // Name the allowed values when the schema lists them ("angle: use 90, 180 or 270").
-    const property = z.toJSONSchema(contract.input, { io: 'input' }).properties?.[issue.path[0]];
-    const choices = property?.enum ?? property?.anyOf?.map(option => option.const).filter(value => value !== undefined);
-    const hint = choices?.length ? `use ${choices.slice(0, -1).join(', ')}${choices.length > 1 ? ' or ' : ''}${choices.at(-1)}` : issue.message;
-    throw new Error(`Invalid input. ${field}: ${hint}.`);
-  }
+  if (!parsed.success) throw new Error(invalidInput(contract, parsed.error).detail);
   const scope = await createScope(values['allow-dir']?.length ? values['allow-dir'] : [process.cwd()]);
   try {
     const { value, files } = await runContract(contract, parsed.data, { scope });

@@ -57,20 +57,6 @@ ${dim('Docs:')}   https://superpdf.ai/docs/mcp-api/command-line-tools
 ${dim('Python:')} pip install superpdf, or uvx superpdf (https://superpdf.ai/docs/python)
 ${dim('Source:')} https://github.com/arjunprabhulal/superpdf
 `;
-/**
- * Markdown as toMarkdown (lib/pdf-structure.js) writes it, with each table as the HTML export's table (colspans and
- * header rows kept), page by page.
- */
-async function markdownHtmlTables(structure){
- const {blockMarkdown,tableHtml}=await import('../lib/pdf-structure.js');
- const out=[];
- for(const page of structure.pages){
-  let previous=null;
-  for(const block of page.blocks){const md=block.type==='table'?tableHtml(block):blockMarkdown(block);if(!md)continue;if(block.type==='list'&&previous==='list')out[out.length-1]+=`\n${md}`;else out.push(md);previous=block.type;}
-  out.push(`<!-- end of page ${page.page} -->`);
- }
- return out.join('\n\n')+'\n';
-}
 /** Throws EEXIST when the output path is taken. Writes still use flag wx, so a file created meanwhile isn't overwritten. */
 async function mustBeNew(path){
  try{await stat(path);}catch(error){if(error.code==='ENOENT')return;throw error;}
@@ -159,26 +145,10 @@ else try {
    if(!['markdown','html','json'].includes(format))throw new Error('Use --format markdown, html or json, or an output ending in .md, .html or .json.');
    if(values.tables&&!['markdown','html'].includes(values.tables))throw new Error('Use --tables markdown or html.');
    if(values.tables&&format!=='markdown')throw new Error('--tables applies to Markdown.');
-   const pdfjs=await import('pdfjs-dist/legacy/build/pdf.mjs');
-   const {extractStructure,buildPageIndex,toMarkdown,toHtml}=await import('../lib/pdf-structure.js');
-   const {pageIndices}=await import('../lib/pdf-core.js');
-   const {documentOptions,scannedPageReader}=await import('../lib/pdf-node.js');
-   // superPDF OCR reads pages that have no text, as the app's exports do.
-   const ocr=values['no-ocr']?null:scannedPageReader({progress:text=>process.stderr.write(`superPDF: ${text}\n`)});
-   const task=pdfjs.getDocument(documentOptions(new Uint8Array(bytes[0])));
-   try{
-    const doc=await task.promise;
-    if(ocr)ocr.documentLanguage=(await doc.getMetadata().catch(()=>({}))).info?.Language;
-    const read=await extractStructure(pdfjs,doc,{pages:pageIndices(values.pages||'',doc.numPages),recognize:ocr&&((page,index,options)=>ocr.recognize(page,index,options))});
-    if(ocr?.pages)process.stderr.write(`superPDF: ${ocr.pages===1?'1 scanned page was':`${ocr.pages} scanned pages were`} recognized with OCR (${(await import('../lib/ocr-languages.js')).languageOf(ocr.language).name}), so check ${ocr.pages===1?'its':'their'} text.\n`);
-    if(ocr?.missed)process.stderr.write(`superPDF: OCR couldn’t read ${ocr.missed===1?'1 scanned page':`${ocr.missed} scanned pages`} (${plainMessage(ocr.failed)}), so ${ocr.missed===1?'it is':'they are'} left without text.\n`);
-    const scanned=read.pages.filter(p=>!p.blocks.length).length;
-    if(scanned)process.stderr.write(`superPDF: ${scanned} page${scanned===1?' has':'s have'} no text${ocr?', even after OCR':' layer (probably scanned). Run without --no-ocr to recognize '+(scanned===1?'it':'them')+' with superPDF OCR'}.\n`);
-    const structure=cleanValue(read);
-    const content=format==='html'?toHtml(structure):format==='json'?JSON.stringify({...structure,sections:cleanValue(await buildPageIndex(doc,structure))},null,2):values.tables==='html'?await markdownHtmlTables(structure):toMarkdown(structure);
-    if(values.output){await writeFile(values.output,content,{flag:'wx'});process.stdout.write(JSON.stringify({operation:'export',format,output:values.output,pages:structure.pages.length})+'\n');}
-    else process.stdout.write(content);
-   }finally{await ocr?.close();await task.destroy();}
+   const {exportDocument}=await import('../lib/export.js');
+   const {content,pages}=await exportDocument(bytes[0],{format,pages:values.pages||'',tables:values.tables||'markdown',ocr:!values['no-ocr'],onMessage:text=>process.stderr.write(`superPDF: ${text}\n`)});
+   if(values.output){await writeFile(values.output,content,{flag:'wx'});process.stdout.write(JSON.stringify({operation:'export',format,output:values.output,pages})+'\n');}
+   else process.stdout.write(content);
   }
   else {
    let result;
