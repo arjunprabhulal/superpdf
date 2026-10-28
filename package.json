@@ -61,7 +61,7 @@
     "pptxgenjs": "4.0.1",
     "tesseract.js": "7.0.0",
     "write-excel-file": "4.1.1",
-    "zod": "4.6.6"
+    "zod": "4.6.7"
   },
   "homepage": "https://superpdf.ai/docs/mcp-api/command-line-tools",
   "repository": {
