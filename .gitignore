@@ -2,3 +2,6 @@ node_modules/
 *.tgz
 .DS_Store
 .readme-preview.html
+# Claude Desktop extension staging and output (npm run mcpb)
+build/
+dist/
