@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Claude Desktop extension: `npm run mcpb` builds `dist/superpdf-<version>.mcpb`, an MCP Bundle that installs the
+  MCP server with a double-click. Claude Desktop asks which folders superPDF may use and passes each one as
+  `--allow-dir`; the manifest takes its version from package.json and lists all 30 tools from the tool contracts.
 - `superpdf export https://example.com/report.pdf --output report.md` reads a PDF from an https:// link. Other
   schemes (http:, file:, data:) are refused, and so are hosts on this computer or the local network, checked on the
   address each connection uses, at every redirect (up to 5). Downloads stop at 2 GB or after 60 seconds without data,

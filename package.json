@@ -44,7 +44,8 @@
   "scripts": {
     "test": "node --test tests/*.test.js && tsc -p tests/types",
     "openapi": "node scripts/openapi.js",
-    "sdk:types": "node scripts/sdk-types.js"
+    "sdk:types": "node scripts/sdk-types.js",
+    "mcpb": "node scripts/mcpb.js"
   },
   "engines": {
     "node": ">=22"
